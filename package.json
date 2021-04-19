@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "@googleapis/docs": "^0.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "google-spreadsheet": "^3.1.15",
+    "googleapis": "^71.0.0",
     "mysql2": "^2.2.5"
   }
 }
