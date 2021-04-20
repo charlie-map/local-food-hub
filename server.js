@@ -138,7 +138,7 @@ create_main_log_object("1eao1E4mzLu4oXINDrezLIf8pOQh6L4J9LdUAgfOpYaw").then((she
 ------------------ need to update the value on their status page based on that, a very similar function could be used for sending status reports
 	output- status: either "need submission" or "completed"
 */
-function check_status(farmer_sheet_log_value, sheet_id) {
+async function check_status(farmer_sheet_log_value, sheet_id) {
 	// load in the sheet
 	let doc = new GoogleSpreadsheet(sheet_id);
 
