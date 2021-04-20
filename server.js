@@ -16,17 +16,17 @@ const { edit_dist } = require("./utils.js");
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
 const frequency_ofSubmission = {
-	daily: 0,
-	weekly: 1,
-	monthly: 2,
-	seasonal: 3,
-	annual: 4,
+	daily: 0, // a must submit
+	weekly: 1, // must submit
+	monthly: 2, // must submit
+	seasonal: 3, // must submit
+	annual: 4, // must submit
 	onincident: 5,
 	asneeded: 6,
 	correctiveaction: 7,
 	riskassesment: 8,
-	preharvest: 9,
-	deliverydays: 10
+	preharvest: 9, // must submit
+	deliverydays: 10 // must submit
 }
 
 const SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
@@ -122,6 +122,33 @@ async function create_main_log_object(sheet_id) {
 create_main_log_object("1eao1E4mzLu4oXINDrezLIf8pOQh6L4J9LdUAgfOpYaw").then((sheet_answer) => {
 	console.log(sheet_answer);
 });
+
+/* Function check_status
+	inputs- farmer_sheet_log_value: the farmers log sheet value (at specific id) that checks the file and sees when they might need to submit it
+				The idea with that being that it only cares for certain values:
+					1. daily = 0
+					2. weekly = 1
+					3. monthly = 2
+					4. seasonal = 3
+					5. annual = 4
+					6. preharvest = 9
+					7. deliverydays = 10
+			sheet_id: the id of the sheet we need to check for these values (we would know what it's value is based on farmer_sheet_log)
+	functionality- check if they have submitted this form for their current values
+------------------ need to update the value on their status page based on that, a very similar function could be used for sending status reports
+	output- status: either "need submission" or "completed"
+*/
+function check_status(farmer_sheet_log_value, sheet_id) {
+	// load in the sheet
+	let doc = new GoogleSpreadsheet(sheet_id);
+
+	await doc.useServiceAccountAuth({
+		client_email: process.env.CLIENT_EMAIL,
+		private_key: process.env.PRIVATE_KEY
+	});
+
+	await doc.loadInfo();
+}
 
 app.get("/", (req, res) => {
 	res.end("Dumby server!");
