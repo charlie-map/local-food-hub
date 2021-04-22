@@ -45,6 +45,4 @@ function edit_dist(w1, w2) {
 	return array[array.length - 1][array[0].length - 1];
 }
 
-console.log(edit_dist("cat", "bat"));
-
 module.exports = { edit_dist };
