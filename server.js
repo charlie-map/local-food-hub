@@ -1,6 +1,13 @@
 require('dotenv').config({
 	path: __dirname + '/.env'
 });
+//defining new variables for the file ID portion of the project
+const path = require('path');
+const NodeGoogleDrive = require ('node-google-drive-new');
+const YOUR_ROOT_FOLDER = '1J9ydObW7XKUV5vgl-Dchcfopcbepz_Qx',
+  PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
+//^^ I and Z addition to vars in case looking for what might be new
+
 const {
 	google
 } = require('googleapis');
@@ -69,6 +76,51 @@ async function running() {
 	console.log(createResponse.data);
 }
 
+async function findFileID(fileName) {
+	return new Promise(async (resolve, reject) => {
+	const creds_service_user = require(PATH_TO_CREDENTIALS);
+	 
+	const googleDriveInstance = new NodeGoogleDrive({
+	    ROOT_FOLDER: YOUR_ROOT_FOLDER
+	  });
+	 
+	 let gdrive = await googleDriveInstance.useServiceAccountAuth(
+	    creds_service_user
+	  );
+	 
+	  // List Folders under the root folder
+	let folderResponse = await googleDriveInstance.listFolders(
+	    YOUR_ROOT_FOLDER,
+		false
+	  );
+
+	console.log(folderResponse);
+
+
+	//loop through and find the one called "source files"
+	let sourceFilesFolder;
+	folderResponse.folders.forEach((folder) => {
+		if(folder.name == fileName) //this looks hardcoded but it doesn't do anything
+			sourceFilesFolder = folder.id
+	});
+
+	let fileList = await googleDriveInstance.list({
+		fileId: sourceFilesFolder
+
+	})
+
+	console.log("sourceFilesFolder", sourceFilesFolder);
+
+
+	let testFile = fileList.files[0];
+
+	console.log(testFile);
+
+	await googleDriveInstance.getFile(testFile, __dirname);
+	resolve(testFile.fileId);
+});
+}
+
 /*
 	Function create_main_log_object:
 		input: sheet_id: the schedule_log sheet id, which we will save in the database for loading
@@ -90,7 +142,7 @@ async function create_main_log_object(sheet_id) {
 
 	// create an array that can store object data for each value
 	let all_sheet_logs = [];
-	full_row_data.forEach((log_row) => {
+	full_row_data.forEach(async (log_row) => {
 		//console.log("\n\n", log_row._rawData);
 		// run through all the log data
 		// find the ones that have at least 3 items (meaning they have enough data to qualify)
@@ -113,11 +165,11 @@ async function create_main_log_object(sheet_id) {
 			// otherwise we need to encapsulate the important data into an object
 			all_sheet_logs.push({
 				file_name: log_row._rawData[0],
-				file_id: "poop",
+				fileID: await findFileID(log_row._rawData[0]),
 				frequency_ofSubmission: log_row._rawData[2]
-				
 			});
 		}
+		console.log(all_sheet_logs);
 	});
 	return all_sheet_logs;
 }
@@ -157,6 +209,6 @@ app.get("/", (req, res) => {
 	res.end("Dumby server!");
 });
 
-app.listen(3000, () => {
+app.listen(8080, () => {
 	console.log("server go vroom");
 });
