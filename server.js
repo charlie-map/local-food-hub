@@ -50,6 +50,7 @@ connection.connect((err) => {
 	if (err) throw err;
 });
 
+
 async function running() {
 	const authClient = await auth.getClient();
 	console.log(authClient, "\n");
@@ -112,7 +113,9 @@ async function create_main_log_object(sheet_id) {
 			// otherwise we need to encapsulate the important data into an object
 			all_sheet_logs.push({
 				file_name: log_row._rawData[0],
+				file_id: "poop",
 				frequency_ofSubmission: log_row._rawData[2]
+				
 			});
 		}
 	});
