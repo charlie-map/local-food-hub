@@ -38,8 +38,8 @@ function edit_dist(w1, w2) {
 		for (let x = 1; x < array[0].length; x++) { // go through that full column
 			let sub_add = w1[y] == w2[x] ? 0 : 1; // check for adding onto sub case
 			// check the transpose case
-			array[y][x] = (w1[x] == w2[y - 1] && w1[x - 1] == w2[y]) ? array[y][x] = min([sub_add + array[y - 1][x - 1], 1 + array[y][x - 1], 1 + array[y - 1][x], 1 + array[y - 2][x - 2]]) :
-			array[y][x] = min([sub_add + array[y - 1][x - 1], 1 + array[y][x - 1], 1 + array[y - 1][x]]);
+			let transpose = array[y - 2] && array[y - 2][x - 2] ? array[y - 2][x - 2] : 10000;
+			array[y][x] = (w1[x] == w2[y - 1] && w1[x - 1] == w2[y]) ? array[y][x] = min([sub_add + array[y - 1][x - 1], 1 + array[y][x - 1], 1 + array[y - 1][x], 1 + transpose]) : min([sub_add + array[y - 1][x - 1], 1 + array[y][x - 1], 1 + array[y - 1][x]]);
 		}
 	}
 	return array[array.length - 1][array[0].length - 1];
