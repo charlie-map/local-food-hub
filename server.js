@@ -1,11 +1,12 @@
 require('dotenv').config({
 	path: __dirname + '/.env'
 });
+
 //defining new variables for the file ID portion of the project
 const path = require('path');
-const NodeGoogleDrive = require ('node-google-drive-new');
+const NodeGoogleDrive = require('node-google-drive-new');
 const YOUR_ROOT_FOLDER = '1J9ydObW7XKUV5vgl-Dchcfopcbepz_Qx',
-  PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
+	PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
 //^^ I and Z addition to vars in case looking for what might be new
 
 const {
@@ -19,7 +20,9 @@ const express = require('express');
 const mysql = require('mysql2');
 const app = express();
 
-const { edit_dist } = require("./utils.js");
+const {
+	edit_dist
+} = require("./utils.js");
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
 const frequency_ofSubmission = {
@@ -78,47 +81,41 @@ async function running() {
 
 async function findFileID(fileName) {
 	return new Promise(async (resolve, reject) => {
-	const creds_service_user = require(PATH_TO_CREDENTIALS);
-	 
-	const googleDriveInstance = new NodeGoogleDrive({
-	    ROOT_FOLDER: YOUR_ROOT_FOLDER
-	  });
-	 
-	 let gdrive = await googleDriveInstance.useServiceAccountAuth(
-	    creds_service_user
-	  );
-	 
-	  // List Folders under the root folder
-	let folderResponse = await googleDriveInstance.listFolders(
-	    YOUR_ROOT_FOLDER,
-		false
-	  );
+		const creds_service_user = require(PATH_TO_CREDENTIALS);
+		const googleDriveInstance = new NodeGoogleDrive({
+			ROOT_FOLDER: YOUR_ROOT_FOLDER
+		});
+		let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+		// List Folders under the root folder
 
-	console.log(folderResponse);
+		// GENDO NOTE: check usage here: https://www.npmjs.com/package/node-google-drive-new
+		let folderResponse = await googleDriveInstance.listFolders(
+			YOUR_ROOT_FOLDER, null, false
+		);
+		
+		//loop through and find the one called "source files"
+		let sourceFilesFolder;
+		folderResponse.folders.forEach((folder) => {
+			if (folderResponse.name == fileName) //this looks hardcoded but it doesn't do anything
+				sourceFilesFolder = folder.id
+		});
+		console.log("FOUND INFO", folderResponse.folders[0].id);
+		let fileList = await googleDriveInstance.list({
+			fileId: sourceFilesFolder
+		})
+		let testFile = fileList.files[0];
 
+		await googleDriveInstance.getFile(testFile, __dirname);
 
-	//loop through and find the one called "source files"
-	let sourceFilesFolder;
-	folderResponse.folders.forEach((folder) => {
-		if(folder.name == fileName) //this looks hardcoded but it doesn't do anything
-			sourceFilesFolder = folder.id
+		// check the status of the file
+		console.log("FILE D", testFile.fileId);
+		let revisions = gdrive.revisions.get({
+			fileId: testFile.fileId
+		});
+
+		console.log(revisions);
+		resolve(testFile.fileId);
 	});
-
-	let fileList = await googleDriveInstance.list({
-		fileId: sourceFilesFolder
-
-	})
-
-	console.log("sourceFilesFolder", sourceFilesFolder);
-
-
-	let testFile = fileList.files[0];
-
-	console.log(testFile);
-
-	await googleDriveInstance.getFile(testFile, __dirname);
-	resolve(testFile.fileId);
-});
 }
 
 /*
@@ -163,13 +160,14 @@ async function create_main_log_object(sheet_id) {
 			log_row._rawData[2] = frequency_ofSubmission[temporary_item];
 
 			// otherwise we need to encapsulate the important data into an object
-			all_sheet_logs.push({
-				file_name: log_row._rawData[0],
-				fileID: await findFileID(log_row._rawData[0]),
-				frequency_ofSubmission: log_row._rawData[2]
-			});
+			await findFileID(log_row._rawData[0]);
+			// all_sheet_logs.push({
+			// 	file_name: log_row._rawData[0],
+			// 	fileID: await findFileID(log_row._rawData[0]),
+			// 	frequency_ofSubmission: log_row._rawData[2]
+			// });
 		}
-		console.log(all_sheet_logs);
+		//console.log(all_sheet_logs);
 	});
 	return all_sheet_logs;
 }
@@ -193,17 +191,6 @@ create_main_log_object("1eao1E4mzLu4oXINDrezLIf8pOQh6L4J9LdUAgfOpYaw").then((she
 ------------------ need to update the value on their status page based on that, a very similar function could be used for sending status reports
 	output- status: either "need submission" or "completed"
 */
-async function check_status(farmer_sheet_log_value, sheet_id) {
-	// load in the sheet
-	let doc = new GoogleSpreadsheet(sheet_id);
-
-	await doc.useServiceAccountAuth({
-		client_email: process.env.CLIENT_EMAIL,
-		private_key: process.env.PRIVATE_KEY
-	});
-
-	await doc.loadInfo();
-}
 
 app.get("/", (req, res) => {
 	res.end("Dumby server!");
