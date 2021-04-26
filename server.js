@@ -43,6 +43,10 @@ const {
 	edit_dist
 } = require("./utils.js");
 
+// Pull date libraries:
+const Sugar = require('sugar');
+const spacetime = require('spacetime');
+
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
 const frequency_ofSubmission = {
@@ -139,8 +143,41 @@ async function create_main_log_object(folder_id) {
 	await doc.loadInfo();
 
 	// pull all of the data from the spreadsheet to then parse through and make a return object
+	await doc.sheetsByIndex[0].loadHeaderRow();
+	if (doc.sheetsByIndex[0].headerValues[doc.sheetsByIndex[0].headerValues.length - 1] != "Times") await doc.sheetsByIndex[0].setHeaderRow([...doc.sheetsByIndex[0].headerValues, "Times"]);
 	let full_row_data = await doc.sheetsByIndex[0].getRows();
-	// create an array that can store object data for each value
+
+	let frequency_position;
+	for (frequency_position = 0; frequency_position < full_row_data.length; frequency_position++) {
+		if (full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2] && edit_dist(full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2], "Frequency") < 2)
+			break;
+	}
+	console.log(frequency_position);
+	// 1, 2, 3, 6, 7
+	let all_dates = [];
+
+	all_dates[0] = ["daily", full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]];
+	all_dates[1] = ["weekly", full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]];
+	all_dates[2] = ["monthly", "first monday of each month"];
+	all_dates[3] = ["seasonal", "first monday of each season"];
+	all_dates[4] = ["annual", full_row_data[frequency_position + 1]._rawData[full_row_data[frequency_position + 1]._rawData.length - 1]];
+	all_dates[5] = ["preharvest", full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]];
+	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1]];
+
+	// get dates of each of these objects using sugarjs
+	all_dates.forEach((item) => {
+		item[1] = Date.create(item[1]);
+	});
+
+	console.log(all_dates);
+
+	// 1. daily = 0 ---- every day at 6am (weekends?)
+	// 2. weekly = 1 ---- mondays at 6am
+	// 3. monthly = 2 ---- first monday of month at 6am
+	// 4. seasonal = 3 ---- start of new season (first monday of 6am)
+	// 5. annual = 4 ---- first monday of new year at 6am
+	// 6. preharvest = 5 ---- august 10th
+	// 7. deliverydays = 6 ---- friday and monday at 6am
 
 	let all_sheet_logs = [];
 	full_row_data.forEach(async (log_row, index) => {
@@ -181,14 +218,6 @@ async function create_main_log_object(folder_id) {
 					// grab the final position in edits and see when it was made compared to the _rawData[2]
 					let modifiedDate = edits[edits.length - 1].modifiedDate;
 					console.log(modifiedDate);
-
-					// 1. daily = 0 ---- every day at 6am (weekends?)
-					// 2. weekly = 1 ---- mondays at 6am
-					// 3. monthly = 2 ---- first monday of month at 6am
-					// 4. seasonal = 3 ---- when should this be due?
-					// 5. annual = 4 ---- first monday of new year at 6am
-					// 6. preharvest = 9 ---- august 10th
-					// 7. deliverydays = 10 ---- friday and monday at 6am
 
 				}
 
