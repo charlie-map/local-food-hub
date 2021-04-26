@@ -4,6 +4,8 @@ require('dotenv').config({
 //defining new variables for the file ID portion of the project
 const path = require('path');
 
+const _SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'];
+
 const NodeGoogleDrive = require('node-google-drive-new');
 const YOUR_ROOT_FOLDER = '1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w',
 	PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
@@ -12,9 +14,26 @@ const YOUR_ROOT_FOLDER = '1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w',
 const {
 	google
 } = require('googleapis');
+const drive = google.drive('v2');
+// create a drive access
+const auth = new google.auth.GoogleAuth({
+	keyFilename: 'key.json',
+	scopes: _SCOPES[1]
+});
+let authClient;
+async function create_client() {
+	authClient = await auth.getClient()
+}
+
+create_client().then(() => {
+	google.options({
+		auth: authClient
+	});
+});
+
 const {
 	GoogleSpreadsheet
-} = require("google-spreadsheet");
+} = require('google-spreadsheet');
 
 const docs = require('@googleapis/docs');
 const express = require('express');
@@ -40,14 +59,12 @@ const frequency_ofSubmission = {
 	deliverydays: 10 // must submit
 }
 
-const SHEETS_SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-// const auth = new google.auth.GoogleAuth({
-// 	process.env.CLIENT_EMAIL, process.env.PRIVATE_KEY, SHEETS_SCOPES});
+// To create user on table (after making database):
+// CREATE USER 'foodhubuser'@'localhost' IDENTIFIED BY '0f28901b-2644-4109-ab06-21f55d49438f';
+// GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
+// FLUSH PRIVILEGES;
 
-//To create user on table (after making database):
-//CREATE USER 'foodhubuser'@'localhost' IDENTIFIED BY '0f28901b-2644-4109-ab06-21f55d49438f';
-//GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
-//FLUSH PRIVILEGES;
+//
 const connection = mysql.createConnection({
 	host: process.env.HOST,
 	database: process.env.DATABASE,
@@ -60,21 +77,6 @@ connection.connect((err) => {
 	if (err) throw err;
 });
 
-async function running() {
-	const authClient = await auth.getClient();
-	console.log(authClient, "\n");
-	const client = await docs.docs({
-		version: 'v1',
-		auth: authClient
-	});
-	const createResponse = await client.documents.create({
-		requestBody: {
-			title: 'Your new document!',
-		},
-	});
-	console.log(createResponse.data);
-}
-
 async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	return new Promise(async (resolve, reject) => {
 		let fileList = await googleDriveInstance.list({
@@ -85,10 +87,10 @@ async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	});
 }
 
-function find_id(all_files, file_name) {
+function find_id(all_files, file_name, submission_frequency) {
 	let lowest_fuzzy = 10000,
 		curr_distance, first_letter_dist;
-	let file_id, return_file_name, return_dist;
+	let file_id, return_file_name, return_dist, return_status;
 	all_files.files.forEach((file) => {
 		curr_distance = edit_dist(file.name.trim(), file_name);
 		first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
@@ -98,7 +100,13 @@ function find_id(all_files, file_name) {
 			return_file_name = file.name.trim();
 		}
 	});
-	return [file_id, return_file_name];
+
+	// find file_id, go into said file and look at the history of the document to consider if it needs submition
+	// check submission frequency to see if it's needed
+	// onincident: 5, asneeded: 6, correctiveaction: 7, riskassesment: 8 <---- NO SUBMISSION needed
+	if (!file_id || frequency_ofSubmission[submission_frequency] == 5 || frequency_ofSubmission[submission_frequency] == 6 || frequency_ofSubmission[submission_frequency] == 7 || frequency_ofSubmission[submission_frequency] == 8)
+		return [file_id, false, return_file_name];
+	return [file_id, true, return_file_name];
 }
 
 /*
@@ -110,7 +118,7 @@ function find_id(all_files, file_name) {
 async function create_main_log_object(folder_id) {
 	const creds_service_user = require(PATH_TO_CREDENTIALS);
 	const googleDriveInstance = new NodeGoogleDrive({
-		ROOT_FOLDER: YOUR_ROOT_FOLDER
+		ROOT_FOLDER: folder_id
 	});
 
 	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
@@ -121,11 +129,9 @@ async function create_main_log_object(folder_id) {
 		if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
 			mainlog_sheet_id = item.id;
 	});
-
 	root_files = await pull_files(googleDriveInstance, folder_id, true);
 
 	let doc = new GoogleSpreadsheet(mainlog_sheet_id);
-
 	await doc.useServiceAccountAuth({
 		client_email: process.env.CLIENT_EMAIL,
 		private_key: process.env.PRIVATE_KEY
@@ -137,33 +143,62 @@ async function create_main_log_object(folder_id) {
 	// create an array that can store object data for each value
 
 	let all_sheet_logs = [];
-	full_row_data.forEach(async (log_row) => {
-		// run through all the log data
+	full_row_data.forEach(async (log_row, index) => {
+		if (index < 2) {
+			// run through all the log data
 
-		// find the ones that have at least 3 items (meaning they have enough data to qualify)
-		if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
-			log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
-			// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
-			let temporary_item;
-			let lowest_fuzzy = 10000;
-			Object.keys(frequency_ofSubmission).forEach((item) => {
-				// compare item and see which we will choose
-				let distance = edit_dist(log_row._rawData[2], item);
-				if (lowest_fuzzy > distance) {
-					temporary_item = item;
-					lowest_fuzzy = distance;
+			// find the ones that have at least 3 items (meaning they have enough data to qualify)
+			if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
+				log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
+				// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
+				let temporary_item;
+				let lowest_fuzzy = 10000;
+				Object.keys(frequency_ofSubmission).forEach((item) => {
+					// compare item and see which we will choose
+					let distance = edit_dist(log_row._rawData[2], item);
+					if (lowest_fuzzy > distance) {
+						temporary_item = item;
+						lowest_fuzzy = distance;
+					}
+				});
+
+				log_row._rawData[2] = temporary_item;
+				// otherwise we need to encapsulate the important data into an object
+				let return_values = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
+				let token = undefined;
+				let edits = [];
+				if (!return_values[1]) {
+					do {
+						// find the actual revisions
+						let res = await drive.revisions.list({
+							fileId: return_values[0],
+							pageToken: token
+						});
+						edits = [...edits, ...res.data.items];
+						token = res.data.nextPageToken ? res.data.nextPageToken : null;
+					} while (token);
+
+					// grab the final position in edits and see when it was made compared to the _rawData[2]
+					let modifiedDate = edits[edits.length - 1].modifiedDate;
+					console.log(modifiedDate);
+
+					// 1. daily = 0 ---- every day at 6am (weekends?)
+					// 2. weekly = 1 ---- mondays at 6am
+					// 3. monthly = 2 ---- first monday of month at 6am
+					// 4. seasonal = 3 ---- when should this be due?
+					// 5. annual = 4 ---- first monday of new year at 6am
+					// 6. preharvest = 9 ---- august 10th
+					// 7. deliverydays = 10 ---- friday and monday at 6am
+
 				}
-			});
 
-			log_row._rawData[2] = frequency_ofSubmission[temporary_item];
-			// otherwise we need to encapsulate the important data into an object
-			let return_values = find_id(root_files, log_row._rawData[0])
-			all_sheet_logs.push({
-				file_name: log_row._rawData[0],
-				fileID: return_values[0],
-				found_file_name: return_values[1],
-				frequency_ofSubmission: log_row._rawData[2]
-			});
+				all_sheet_logs.push({
+					file_name: log_row._rawData[0],
+					fileID: return_values[0],
+					status: return_values[1],
+					frequency_ofSubmission: frequency_ofSubmission[log_row._rawData[2]]
+				});
+			}
 		}
 	});
 	return all_sheet_logs;
