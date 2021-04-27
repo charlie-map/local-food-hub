@@ -70,6 +70,29 @@ const frequency_ofSubmission = {
 // FLUSH PRIVILEGES;
 
 //
+
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const myPlaintextPassword = 'foodhub';
+const someOtherPlaintextPassword = 'foody';
+
+bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+	console.log(hash);
+    // Store hash in password DB.
+
+// get hash from database password DB.
+bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+    // result == true
+bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
+    // result == false
+});
+});
+});
+
+//console.log(myPlaintextPassword);
+
+
+
 const connection = mysql.createConnection({
 	host: process.env.HOST,
 	database: process.env.DATABASE,
@@ -153,14 +176,14 @@ async function create_main_log_object(folder_id) {
 		if (full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2] && edit_dist(full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2], "Frequency") < 2)
 			break;
 	}
-	console.log(frequency_position);
+	//console.log(frequency_position);
 	// 1, 2, 3, 6, 7
 	let all_dates = [];
 
 	all_dates[0] = ["daily", full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]];
 	let current_day = new Date().getDay(), current_month = new Date().getMonth();
 	// for (let choose_week = current_day); 
-	all_dates[1] = ["weekly", new Date(new Date().getFullYear(), new Date.getMonth(), days)];
+	all_dates[1] = ["weekly", new Date(new Date().getFullYear(), new Date().getMonth(), current_day)];
 	all_dates[2] = ["monthly", Sugar.Date.create("first monday of this month")];
 	all_dates[3] = ["seasonal", spacetime.now().quarter()];
 	for (let days = 1; days < 8; days++) { // find first monday of year
@@ -172,7 +195,7 @@ async function create_main_log_object(folder_id) {
 	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")];
 
 	// get dates of each of these objects using sugarjs
-	console.log(all_dates);
+	//console.log(all_dates);
 
 	let temp_sugar;
 	all_dates.forEach((item, main_index) => {
@@ -187,7 +210,7 @@ async function create_main_log_object(folder_id) {
 		}
 	});
 
-	console.log(all_dates);
+	//console.log(all_dates);
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am
@@ -252,7 +275,7 @@ async function create_main_log_object(folder_id) {
 }
 
 create_main_log_object(YOUR_ROOT_FOLDER).then((sheet_answer) => {
-	console.log(sheet_answer);
+	//console.log(sheet_answer);
 });
 
 /* Function check_status
@@ -275,6 +298,18 @@ app.get("/", (req, res) => {
 	res.end("Dumby server!");
 });
 
+app.post("/make-farm", (req, res) => {
+	let test = {farm_name: "test", email: "tastfarm@gmail.com", password: "testpassword", root_folder: "testfarmfolder"}
+	bcrypt.hash(test.password, saltRounds, function(err, hash) {
+		test.password = hash;
+		connection.query("INSERT INTO farmers (farm_name, email, password, root_folder) VALUES (?, ?, ?, ?)", Object.values(test), function (err) {
+			if (err) console.log(err);
+			console.log("dun");
+		});
+
+	});
+});
+
 app.listen(8080, () => {
-	console.log("server go vroom");
+	//console.log("server go vroom");
 });
