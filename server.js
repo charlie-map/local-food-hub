@@ -158,18 +158,33 @@ async function create_main_log_object(folder_id) {
 	let all_dates = [];
 
 	all_dates[0] = ["daily", full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]];
-	all_dates[1] = ["weekly", full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]];
-	all_dates[2] = ["monthly", "first monday of each month"];
-	all_dates[3] = ["seasonal", "first monday of each season"];
-	all_dates[4] = ["annual", full_row_data[frequency_position + 1]._rawData[full_row_data[frequency_position + 1]._rawData.length - 1]];
-	all_dates[5] = ["preharvest", full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]];
-	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1]];
+	let current_day = new Date().getDay(), current_month = new Date().getMonth();
+	// for (let choose_week = current_day); 
+	all_dates[1] = ["weekly", new Date(new Date().getFullYear(), new Date.getMonth(), days)];
+	all_dates[2] = ["monthly", Sugar.Date.create("first monday of this month")];
+	all_dates[3] = ["seasonal", spacetime.now().quarter()];
+	for (let days = 1; days < 8; days++) { // find first monday of year
+		all_dates[4] = ["annual", new Date(new Date().getFullYear(), 0, days, 6)];
+		if (all_dates[4][1].getDay() == 1)
+			break;
+	}
+	all_dates[5] = ["preharvest", Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1])];
+	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")];
 
 	// get dates of each of these objects using sugarjs
 	console.log(all_dates);
 
-	all_dates.forEach((item) => {
-		item[1] = Sugar.Date.create(item[1]);
+	let temp_sugar;
+	all_dates.forEach((item, main_index) => {
+		if (Array.isArray(item[1])) {
+			item[1].forEach((each_day, indeces) => {
+				temp_sugar = Sugar.Date.create(each_day);
+				item[1][indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : moment().day(each_day);
+			});
+		} else if (main_index != 3) {
+			temp_sugar = Sugar.Date.create(item[1]);
+			item[1] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : moment().day(item[1]);
+		}
 	});
 
 	console.log(all_dates);
