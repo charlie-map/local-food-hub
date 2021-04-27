@@ -46,6 +46,7 @@ const {
 // Pull date libraries:
 const Sugar = require('sugar');
 const spacetime = require('spacetime');
+const moment = require('moment');
 
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
@@ -165,8 +166,10 @@ async function create_main_log_object(folder_id) {
 	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1]];
 
 	// get dates of each of these objects using sugarjs
+	console.log(all_dates);
+
 	all_dates.forEach((item) => {
-		item[1] = Date.create(item[1]);
+		item[1] = Sugar.Date.create(item[1]);
 	});
 
 	console.log(all_dates);
