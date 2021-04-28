@@ -69,30 +69,6 @@ const frequency_ofSubmission = {
 // GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
 // FLUSH PRIVILEGES;
 
-//
-
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const myPlaintextPassword = 'foodhub';
-const someOtherPlaintextPassword = 'foody';
-
-bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
-	//console.log(hash);
-    // Store hash in password DB.
-
-// get hash from database password DB.
-bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
-    // result == true
-bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
-    // result == false
-});
-});
-});
-
-//console.log(myPlaintextPassword);
-
-
-
 const connection = mysql.createConnection({
 	host: process.env.HOST,
 	database: process.env.DATABASE,
@@ -104,6 +80,10 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
 	if (err) throw err;
 });
+
+const router = require('./admin');
+
+app.use('/', router);
 
 async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	return new Promise(async (resolve, reject) => {
@@ -281,34 +261,15 @@ async function create_main_log_object(folder_id) {
 
 				log_row._rawData[2] = temporary_item;
 
-				// otherwise we need to encapsulate the important data into an object
-				let return_values = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
-				let token = undefined;
-				let edits = [];
-				if (!return_values[1]) {
-					do {
-						// find the actual revisions
-						let res = await drive.revisions.list({
-							fileId: return_values[0],
-							pageToken: token
-						});
-						edits = [...edits, ...res.data.items];
-						token = res.data.nextPageToken ? res.data.nextPageToken : null;
-					} while (token);
 
-					// grab the final position in edits and see when it was made compared to the _rawData[2]
-					let modifiedDate = edits[edits.length - 1].modifiedDate;
-					//console.log(modifiedDate);
-
-				}
 
 				// compare the modifed date with the files date
 				// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
 
 				all_sheet_logs.push({
 					file_name: log_row._rawData[0],
-					fileID: return_values[0],
-					status: return_values[1],
+					// fileID: return_values[0],
+					// status: return_values[1],
 					frequency_ofSubmission: frequency_ofSubmission[log_row._rawData[2]]
 				});
 			}
@@ -341,18 +302,8 @@ app.get("/", (req, res) => {
 	res.end("Dumby server!");
 });
 
-app.post("/make-farm", (req, res) => {
-	let test = {farm_name: "test", email: "tastfarm@gmail.com", password: "testpassword", root_folder: "testfarmfolder"}
-	bcrypt.hash(test.password, saltRounds, function(err, hash) {
-		test.password = hash;
-		connection.query("INSERT INTO farmers (farm_name, email, password, root_folder) VALUES (?, ?, ?, ?)", Object.values(test), function (err) {
-			if (err) console.log(err);
-			console.log("dun");
-		});
-
-	});
-});
-
 app.listen(8080, () => {
 	console.log("server go vroom");
 });
+
+module.exports = { connection, create_main_log_object };
