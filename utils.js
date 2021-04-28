@@ -1,3 +1,22 @@
+const mysql = require('mysql2');
+
+// To create user on table (after making database):
+// CREATE USER 'foodhubuser'@'localhost' IDENTIFIED BY '0f28901b-2644-4109-ab06-21f55d49438f';
+// GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
+// FLUSH PRIVILEGES;
+
+const connection = mysql.createConnection({
+	host: process.env.HOST,
+	database: process.env.DATABASE,
+	user: process.env.FOOD_USER,
+	password: process.env.PASSWORD,
+	insecureAuth: false
+});
+
+connection.connect((err) => {
+	if (err) throw err;
+});
+
 function make_array(w1, w2) {
 	let array = [];
 	let columns_value = w1.length > w2.length ? w1.length : w2.length;
@@ -45,4 +64,4 @@ function edit_dist(w1, w2) {
 	return array[array.length - 1][array[0].length - 1];
 }
 
-module.exports = { edit_dist };
+module.exports = { edit_dist, connection };

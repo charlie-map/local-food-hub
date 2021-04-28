@@ -37,10 +37,10 @@ const {
 
 const docs = require('@googleapis/docs');
 const express = require('express');
-const mysql = require('mysql2');
 const app = express();
 const {
-	edit_dist
+	edit_dist,
+	connection
 } = require("./utils.js");
 
 // Pull date libraries:
@@ -63,23 +63,6 @@ const frequency_ofSubmission = {
 	preharvest: 9, // must submit
 	deliverydays: 10 // must submit
 }
-
-// To create user on table (after making database):
-// CREATE USER 'foodhubuser'@'localhost' IDENTIFIED BY '0f28901b-2644-4109-ab06-21f55d49438f';
-// GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
-// FLUSH PRIVILEGES;
-
-const connection = mysql.createConnection({
-	host: process.env.HOST,
-	database: process.env.DATABASE,
-	user: process.env.FOOD_USER,
-	password: process.env.PASSWORD,
-	insecureAuth: false
-});
-
-connection.connect((err) => {
-	if (err) throw err;
-});
 
 const router = require('./admin');
 
