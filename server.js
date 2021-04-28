@@ -77,7 +77,7 @@ const myPlaintextPassword = 'foodhub';
 const someOtherPlaintextPassword = 'foody';
 
 bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
-	console.log(hash);
+	//console.log(hash);
     // Store hash in password DB.
 
 // get hash from database password DB.
@@ -137,6 +137,34 @@ function find_id(all_files, file_name, submission_frequency) {
 	return [file_id, true, return_file_name];
 }
 
+async function pull_main_logs(googleDriveInstance, main_folder_id) {
+	return new Promise(async (resolve, reject) => {
+		// find all big logs copies by first pulling out each file in the main_log
+		let fileList = await pull_files(googleDriveInstance, main_folder_id, false);
+
+		let return_sheets = [];
+		// find each folder name
+		let promiseBound = fileList.files.map(async (item) => {
+			if (item.mimeType.split(".")[item.mimeType.split(".").length - 1] == "folder") {
+
+				// grab folder name, then search for the spreadsheet within there
+				let inner_files = await pull_files(googleDriveInstance, item.id, false);
+
+				// find the one most related to "[name] Completed Logs"
+				for (let find_name = 0; find_name < inner_files.files.length; find_name++) {
+					if (edit_dist(item.name.toLowerCase(), inner_files.files[find_name].name.toLowerCase().substring(0, item.name.length)) < 3) {
+						return_sheets.push(inner_files.files[find_name]);
+						return;
+					}
+				}
+			}
+		});
+		Promise.all(promiseBound).then(() => {
+			resolve(return_sheets);
+		});
+	});
+}
+
 /*
 	Function create_main_log_object:
 		input: sheet_id: the schedule_log sheet id, which we will save in the database for loading
@@ -158,6 +186,8 @@ async function create_main_log_object(folder_id) {
 			mainlog_sheet_id = item.id;
 	});
 	root_files = await pull_files(googleDriveInstance, folder_id, true);
+	let main_logs = await pull_main_logs(googleDriveInstance, folder_id);
+	//console.log(main_logs);
 
 	let doc = new GoogleSpreadsheet(mainlog_sheet_id);
 	await doc.useServiceAccountAuth({
@@ -176,41 +206,50 @@ async function create_main_log_object(folder_id) {
 		if (full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2] && edit_dist(full_row_data[frequency_position]._rawData[full_row_data[frequency_position]._rawData.length - 2], "Frequency") < 2)
 			break;
 	}
-	//console.log(frequency_position);
+
 	// 1, 2, 3, 6, 7
 	let all_dates = [];
 
-	all_dates[0] = ["daily", full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]];
-	let current_day = new Date().getDay(), current_month = new Date().getMonth();
-	// for (let choose_week = current_day); 
-	all_dates[1] = ["weekly", new Date(new Date().getFullYear(), new Date().getMonth(), current_day)];
-	all_dates[2] = ["monthly", Sugar.Date.create("first monday of this month")];
+	let daily_value = full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1].toLowerCase().split(/[ :]+/);
+	daily_value[0] = daily_value[1] == "pm" ? parseInt(daily_value[0], 10) + 12 : parseInt(daily_value[0], 10) + 0;
+	all_dates[0] = ["daily", new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0])];
+	all_dates[0][1] = Sugar.Date.isFuture(all_dates[0][1]) ? new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7, daily_value[0]) : all_dates[0][1];
+
+	let weekly_value = new Date(moment().day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
+	weekly_value = new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
+	weekly_value = Sugar.Date.isFuture(weekly_value) ? new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate() - 7, daily_value[0]) : new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
+	all_dates[1] = ["weekly", weekly_value];
+
+	// get first week of this month
+	let monthly_value = new Date(moment().day(full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]));
+	monthly_value = new Date(monthly_value.getFullYear(), monthly_value.getMonth(), Math.round((monthly_value.getDate() + 1) % 7), daily_value[0]);
+
+	all_dates[2] = ["monthly", monthly_value];
 	all_dates[3] = ["seasonal", spacetime.now().quarter()];
 	for (let days = 1; days < 8; days++) { // find first monday of year
-		all_dates[4] = ["annual", new Date(new Date().getFullYear(), 0, days, 6)];
+		all_dates[4] = ["annual", new Date(new Date().getFullYear(), 0, days, daily_value[0])];
 		if (all_dates[4][1].getDay() == 1)
 			break;
 	}
-	all_dates[5] = ["preharvest", Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1])];
-	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")];
+	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
+	while (Sugar.Date.isFuture(preharvest_date)) {
+		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
+	}
+	all_dates[5] = ["preharvest", preharvest_date];
+	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")]; // full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")];
 
 	// get dates of each of these objects using sugarjs
-	//console.log(all_dates);
 
 	let temp_sugar;
-	all_dates.forEach((item, main_index) => {
-		if (Array.isArray(item[1])) {
-			item[1].forEach((each_day, indeces) => {
-				temp_sugar = Sugar.Date.create(each_day);
-				item[1][indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : moment().day(each_day);
-			});
-		} else if (main_index != 3) {
-			temp_sugar = Sugar.Date.create(item[1]);
-			item[1] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : moment().day(item[1]);
-		}
-	});
+	if (Array.isArray(all_dates[6][1])) {
+		all_dates[6][1].forEach((each_day, indeces) => {
+			temp_sugar = Sugar.Date.create("last " + each_day);
+			all_dates[6][indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : new Date(moment().day(each_day));
+			all_dates[6][indeces] = new Date(all_dates[6][indeces].getFullYear(), all_dates[6][indeces].getMonth(), all_dates[6][indeces].getDate(), daily_value[0]);
+		});
+	}
 
-	//console.log(all_dates);
+	console.log(all_dates);
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am
@@ -241,6 +280,7 @@ async function create_main_log_object(folder_id) {
 				});
 
 				log_row._rawData[2] = temporary_item;
+
 				// otherwise we need to encapsulate the important data into an object
 				let return_values = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
 				let token = undefined;
@@ -258,9 +298,12 @@ async function create_main_log_object(folder_id) {
 
 					// grab the final position in edits and see when it was made compared to the _rawData[2]
 					let modifiedDate = edits[edits.length - 1].modifiedDate;
-					console.log(modifiedDate);
+					//console.log(modifiedDate);
 
 				}
+
+				// compare the modifed date with the files date
+				// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
 
 				all_sheet_logs.push({
 					file_name: log_row._rawData[0],
@@ -311,5 +354,5 @@ app.post("/make-farm", (req, res) => {
 });
 
 app.listen(8080, () => {
-	//console.log("server go vroom");
+	console.log("server go vroom");
 });
