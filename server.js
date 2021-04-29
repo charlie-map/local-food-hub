@@ -81,23 +81,37 @@ async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 function find_id(all_files, file_name, submission_frequency) {
 	let lowest_fuzzy = 10000,
 		curr_distance, first_letter_dist;
-	let file_id, return_file_name, return_dist, return_status;
+	let file_id, return_file_name, return_dist, parent_id, type;
 	all_files.files.forEach((file) => {
 		curr_distance = edit_dist(file.name.trim(), file_name);
 		first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
-		if (curr_distance < lowest_fuzzy && first_letter_dist < 3) {
+
+		// console.log(curr_distance < lowest_fuzzy, first_letter_dist < 3, file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form");
+		if (curr_distance < lowest_fuzzy && first_letter_dist < 3 && file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form") {
 			lowest_fuzzy = curr_distance;
 			file_id = file.id;
 			return_file_name = file.name.trim();
+			parent_id = file.parents[file.parents.length - 1];
+			type = file.mimeType.split(".")[file.mimeType.split(".").length - 1];
 		}
 	});
 
-	// find file_id, go into said file and look at the history of the document to consider if it needs submition
-	// check submission frequency to see if it's needed
-	// onincident: 5, asneeded: 6, correctiveaction: 7, riskassesment: 8 <---- NO SUBMISSION needed
-	if (!file_id || frequency_ofSubmission[submission_frequency] == 5 || frequency_ofSubmission[submission_frequency] == 6 || frequency_ofSubmission[submission_frequency] == 7 || frequency_ofSubmission[submission_frequency] == 8)
-		return [file_id, false, return_file_name];
-	return [file_id, true, return_file_name];
+	if (!file_id || lowest_fuzzy > 10) { // redo process, but look for a sheet instead
+		all_files.files.forEach((file) => {
+			curr_distance = edit_dist(file.name.trim(), file_name);
+			first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
+
+			if (curr_distance < lowest_fuzzy && first_letter_dist < 3 && file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "spreadsheet") {
+				lowest_fuzzy = curr_distance;
+				file_id = file.id;
+				return_file_name = file.name.trim();
+				parent_id = file.parents[file.parents.length - 1];
+				type = file.mimeType.split(".")[file.mimeType.split(".").length - 1];
+			}
+		});
+	}
+
+	return [file_id, type, return_file_name, parent_id];
 }
 
 async function pull_main_logs(googleDriveInstance, main_folder_id) {
@@ -142,15 +156,34 @@ async function create_main_log_object(folder_id) {
 
 	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
 
-	let root_files = await pull_files(googleDriveInstance, folder_id, false);
+	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
 	let mainlog_sheet_id = "";
 	root_files.files.forEach((item) => {
 		if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
 			mainlog_sheet_id = item.id;
 	});
-	root_files = await pull_files(googleDriveInstance, folder_id, true);
+
+	root_files = await pull_files(googleDriveInstance, folder_id, true, true);
 	let main_logs = await pull_main_logs(googleDriveInstance, folder_id);
-	//console.log(main_logs);
+	// go through main logs and create a connnection to each spreadsheet
+	let pull_logs = main_logs.map(async (log, index) => {
+		return new Promise(async (resolve, reject) => {
+			let pull_log_doc = new GoogleSpreadsheet(log.id);
+			await pull_log_doc.useServiceAccountAuth({
+				client_email: process.env.CLIENT_EMAIL,
+				private_key: process.env.PRIVATE_KEY
+			})
+			await pull_log_doc.loadInfo();
+			main_logs[index] = {
+				name: log.name,
+				parent_id: log.parents[log.parents.length - 1],
+				doc: pull_log_doc
+			}
+			resolve();
+		});
+	});
+	await Promise.all(pull_logs);
+	console.log(main_logs);
 
 	let doc = new GoogleSpreadsheet(mainlog_sheet_id);
 	await doc.useServiceAccountAuth({
@@ -212,8 +245,6 @@ async function create_main_log_object(folder_id) {
 		});
 	}
 
-	console.log(all_dates);
-
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am
 	// 3. monthly = 2 ---- first monday of month at 6am
@@ -223,36 +254,55 @@ async function create_main_log_object(folder_id) {
 	// 7. deliverydays = 6 ---- friday and monday at 6am
 
 	let all_sheet_logs = [];
+	let count = 0;
 	full_row_data.forEach(async (log_row, index) => {
-		if (index < 2) {
-			// run through all the log data
+		// run through all the log data
+		// find the ones that have at least 3 items (meaning they have enough data to qualify)
+		if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
+			log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
+			// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
+			let temporary_item;
+			let lowest_fuzzy = 10000;
+			Object.keys(frequency_ofSubmission).forEach((item) => {
+				// compare item and see which we will choose
+				let distance = edit_dist(log_row._rawData[2], item);
+				if (lowest_fuzzy > distance) {
+					temporary_item = item;
+					lowest_fuzzy = distance;
+				}
+			});
 
-			// find the ones that have at least 3 items (meaning they have enough data to qualify)
-			if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
-				log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
-				// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
-				let temporary_item;
-				let lowest_fuzzy = 10000;
-				Object.keys(frequency_ofSubmission).forEach((item) => {
-					// compare item and see which we will choose
-					let distance = edit_dist(log_row._rawData[2], item);
-					if (lowest_fuzzy > distance) {
-						temporary_item = item;
-						lowest_fuzzy = distance;
+			log_row._rawData[2] = temporary_item;
+
+			// compare the modifed date with the files date
+			// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
+			let return_file = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
+			let use_spreadsheet; // save the index of the spreadsheet we're using for this specific file
+
+			main_logs.forEach((log, log_index) => { // find the main log connected to this file
+				if (log.parent_id == return_file[3]) {
+					use_spreadsheet = log_index;
+				}
+			});
+
+			// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
+			if (main_logs[use_spreadsheet] && return_file[0]) {
+				// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
+				let spreadsheet_index_index = -1;
+				if (return_file[1] == "form") for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
+					// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
+					if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "")) < 2) {
+						spreadsheet_index_index = run;
+						break;
 					}
-				});
+				}
 
-				log_row._rawData[2] = temporary_item;
-
-
-
-				// compare the modifed date with the files date
-				// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
+				console.log(spreadsheet_index_index, log_row._rawData[0], return_file[1]);
 
 				all_sheet_logs.push({
 					file_name: log_row._rawData[0],
-					// fileID: return_values[0],
-					// status: return_values[1],
+					fileID: return_file[0],
+					status: return_file[1],
 					frequency_ofSubmission: frequency_ofSubmission[log_row._rawData[2]]
 				});
 			}
@@ -262,7 +312,8 @@ async function create_main_log_object(folder_id) {
 }
 
 create_main_log_object(YOUR_ROOT_FOLDER).then((sheet_answer) => {
-	//console.log(sheet_answer);
+	//console.log(sheet_answer);		// console.log(curr_distance < lowest_fuzzy, first_letter_dist < 3, file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form");
+
 });
 
 /* Function check_status
@@ -289,4 +340,7 @@ app.listen(8080, () => {
 	console.log("server go vroom");
 });
 
-module.exports = { connection, create_main_log_object };
+module.exports = {
+	connection,
+	create_main_log_object
+};
