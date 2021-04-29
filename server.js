@@ -208,40 +208,42 @@ async function create_main_log_object(folder_id) {
 
 	let daily_value = full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1].toLowerCase().split(/[ :]+/);
 	daily_value[0] = daily_value[1] == "pm" ? parseInt(daily_value[0], 10) + 12 : parseInt(daily_value[0], 10) + 0;
-	all_dates[0] = ["daily", new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0])];
-	all_dates[0][1] = Sugar.Date.isFuture(all_dates[0][1]) ? new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7, daily_value[0]) : all_dates[0][1];
+	all_dates.daily = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0]);
+	all_dates.daily = Sugar.Date.isFuture(all_dates.daily) ? new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 7, daily_value[0]) : all_dates.daily;
 
 	let weekly_value = new Date(moment().day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
 	weekly_value = new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
 	weekly_value = Sugar.Date.isFuture(weekly_value) ? new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate() - 7, daily_value[0]) : new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
-	all_dates[1] = ["weekly", weekly_value];
+	all_dates.weekly = weekly_value;
 
 	// get first week of this month
 	let monthly_value = new Date(moment().day(full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]));
 	monthly_value = new Date(monthly_value.getFullYear(), monthly_value.getMonth(), Math.round((monthly_value.getDate() + 1) % 7), daily_value[0]);
 
-	all_dates[2] = ["monthly", monthly_value];
-	all_dates[3] = ["seasonal", spacetime.now().quarter()];
+	all_dates.monthly = monthly_value;
+	all_dates.seasonal = spacetime.now().quarter();
 	for (let days = 1; days < 8; days++) { // find first monday of year
-		all_dates[4] = ["annual", new Date(new Date().getFullYear(), 0, days, daily_value[0])];
-		if (all_dates[4][1].getDay() == 1)
+		all_dates.annual = new Date(new Date().getFullYear(), 0, days, daily_value[0]);
+		if (all_dates.annual.getDay() == 1)
 			break;
 	}
+	if (Sugar.Date.isFuture(all_dates.annual)) all_dates.annual = new Date(new Date(all_dates.annual).getFullYear() - 1, 0, new Date(all_dates.annual).getDay(), daily_value[0]);
+	
 	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
 	while (Sugar.Date.isFuture(preharvest_date)) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	}
-	all_dates[5] = ["preharvest", preharvest_date];
-	all_dates[6] = ["deliverydays", full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")]; // full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")];
+	all_dates.preharvest = preharvest_date;
+	all_dates.deliverydays = full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and");
 
 	// get dates of each of these objects using sugarjs
 
 	let temp_sugar;
-	if (Array.isArray(all_dates[6][1])) {
-		all_dates[6][1].forEach((each_day, indeces) => {
+	if (Array.isArray(all_dates.deliverydays)) {
+		Object.values(all_dates).forEach((each_day, indeces) => {
 			temp_sugar = Sugar.Date.create("last " + each_day);
-			all_dates[6][indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : new Date(moment().day(each_day));
-			all_dates[6][indeces] = new Date(all_dates[6][indeces].getFullYear(), all_dates[6][indeces].getMonth(), all_dates[6][indeces].getDate(), daily_value[0]);
+			all_dates.deliverydays[indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : new Date(moment().day(each_day));
+			all_dates.deliverydays[indeces] = new Date(all_dates.deliverydays[indeces].getFullYear(), all_dates.deliverydays[indeces].getMonth(), all_dates.deliverydays[indeces].getDate(), daily_value[0]);
 		});
 	}
 
@@ -289,15 +291,28 @@ async function create_main_log_object(folder_id) {
 			if (main_logs[use_spreadsheet] && return_file[0]) {
 				// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 				let spreadsheet_index_index = -1;
-				if (return_file[1] == "form") for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
-					// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
-					if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "")) < 2) {
-						spreadsheet_index_index = run;
-						break;
+				if (return_file[1] == "form")
+					for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
+						// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
+						if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "")) < 2) {
+							spreadsheet_index_index = run;
+							break;
+						}
+					}
+
+				let status = true; // if they still need to turn it in
+				if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
+					let spreadsheet_rows = await main_logs[use_spreadsheet].doc.sheetsByIndex[spreadsheet_index_index].getRows();
+					// grab most recent value (specifically the timestamp) in the table
+					if (spreadsheet_rows[spreadsheet_rows.length - 1]) { // check that time stamp of that value
+						//console.log(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData);
+						let timestamp = new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]);
+						console.log("\n\n", all_dates[log_row._rawData[2]]);
+						if (Sugar.Date(all_dates[log_row._rawData[2]]).isAfter(timestamp)) {
+							console.log(log_row._rawData[0], log_row._rawData[2], "LATE", timestamp);
+						}
 					}
 				}
-
-				console.log(spreadsheet_index_index, log_row._rawData[0], return_file[1]);
 
 				all_sheet_logs.push({
 					file_name: log_row._rawData[0],
