@@ -64,9 +64,7 @@ const frequency_ofSubmission = {
 	deliverydays: 10 // must submit
 }
 
-const router = require('./admin');
-
-app.use('/', router);
+const router = require('./router');
 
 async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	return new Promise(async (resolve, reject) => {
@@ -134,7 +132,7 @@ async function pull_main_logs(googleDriveInstance, main_folder_id) {
 		output: all_sheet_logs: the main log object of all the different forms they need filled out
 			with their names and times of fillling out (daily, weekly, on incident, etc.)
 */
-async function create_main_log_object(folder_id) {
+let create_main_log_object = async function(folder_id) {
 	const creds_service_user = require(PATH_TO_CREDENTIALS);
 	const googleDriveInstance = new NodeGoogleDrive({
 		ROOT_FOLDER: folder_id
