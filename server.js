@@ -228,7 +228,7 @@ async function create_main_log_object(folder_id) {
 			break;
 	}
 	if (Sugar.Date.isFuture(all_dates.annual)) all_dates.annual = new Date(new Date(all_dates.annual).getFullYear() - 1, 0, new Date(all_dates.annual).getDay(), daily_value[0]);
-	
+
 	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
 	while (Sugar.Date.isFuture(preharvest_date)) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
@@ -300,30 +300,44 @@ async function create_main_log_object(folder_id) {
 						}
 					}
 
-				let status = true; // if they still need to turn it in
+				let status = false; // if they still need to turn it in
 				if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
-					let spreadsheet_rows = await main_logs[use_spreadsheet].doc.sheetsByIndex[spreadsheet_index_index].getRows();
-					// grab most recent value (specifically the timestamp) in the table
-					if (spreadsheet_rows[spreadsheet_rows.length - 1]) { // check that time stamp of that value
-						//console.log(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData);
-						let timestamp = new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]);
-						console.log("\n\n", all_dates[log_row._rawData[2]]);
-						if (Sugar.Date(all_dates[log_row._rawData[2]]).isAfter(timestamp)) {
-							console.log(log_row._rawData[0], log_row._rawData[2], "LATE", timestamp);
-						}
-					}
+					status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index)
+				} else { // dealing with a spreadsheet
+					let check_altDoc = new GoogleSpreadsheet(return_file[0]);
+					await check_altDoc.useServiceAccountAuth({
+						client_email: process.env.CLIENT_EMAIL,
+						private_key: process.env.PRIVATE_KEY
+					});
+					await check_altDoc.loadInfo();
+					console.log("\n\n\n", check_altDoc.sheetsByIndex[0]);
+					status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2]);
 				}
 
 				all_sheet_logs.push({
 					file_name: log_row._rawData[0],
 					fileID: return_file[0],
-					status: return_file[1],
+					status: status,
 					frequency_ofSubmission: frequency_ofSubmission[log_row._rawData[2]]
 				});
 			}
 		}
 	});
 	return all_sheet_logs;
+}
+
+async function check_status(google_sheet, all_dates, indicated_date, specific_spreadsheet, specific_index) {
+	let spreadsheet_rows = await specific_spreadsheet && specific_index ? google_sheet[specific_spreadsheet].doc.sheetsByIndex[specific_index].getRows() : google_sheet.getRows();
+
+	console.log("PAST ROW");
+	// grab most recent value (specifically the timestamp) in the table
+	if (!spreadsheet_rows[spreadsheet_rows.length - 1]) return true; // check to make sure there are values
+	//console.log(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData);
+	let timestamp = new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]);
+	console.log("\n\n", all_dates[indicated_date]);
+	if (Sugar.Date(all_dates[indicated_date]).isAfter(timestamp))
+		return true;
+	return false;
 }
 
 create_main_log_object(YOUR_ROOT_FOLDER).then((sheet_answer) => {
