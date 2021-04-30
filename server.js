@@ -12,7 +12,11 @@ const {
 	create_main_log_object
 } = require('./google.utils.js');
 
+const router = require('./router');
+
 const app = express();
+
+app.use('/',router);
 
 create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w').then((sheet_answer) => {
 	console.log("test", sheet_answer);
