@@ -6,7 +6,7 @@
 
 body {
   font-family: verdana;
-  background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
+  background-color: white
   background-repeat: no-repeat;
   background-size: cover;
   margin: 2em 1em;
@@ -26,14 +26,11 @@ h1 {
   background-color: #f5fff5;
   margin: auto;
   display: grid;
-  grid-gap: 1em;
-  padding: 2em;
-  max-width: 100ch;
-}*/
-
+}
+*/
 table, th, td {
   padding: 10px;
-  text-align: center;
+  text-align: left;
   margin: auto;
 }
 
@@ -63,32 +60,21 @@ label {
   font-weight: bold;
 }
 
-/*input {
-  border: 1px solid silver;
-  display: block;
-  font-size: 16px;
-  margin-bottom: 10px;
-  padding: 5px;
-  width: 100%;
-}*/
-
-/*form button {
-  background-color: #bbbbf2;
-  border: 2px solid currentColor;
-  border-radius: 0.25em;
+button {
+  border-collapse:separate;
+  border-radius:10px;
+  -moz-border-radius:6px;
+  border: 2px solid #006400;
+  background-color: white;
+  color: #006400;
+  padding: 10px 15px;
+  font-size: 15px;
   cursor: pointer;
-  font-size: inherit;
-  line-height: 1.4em;
-  padding: 0.25em 1em;
-  max-width: 20ch;
+  display: block;
+  margin: 0 auto;
 }
 
-form button:hover {
-  background-color: lavender;
+button:hover {
+  background-color: #006400;
+  color: white;
 }
-
-footer {
-  margin-top: 3em;
-  padding-top: 1.5em;
-  border-top: 1px solid lightgrey;
-}*/

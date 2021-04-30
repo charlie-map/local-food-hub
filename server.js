@@ -1,6 +1,7 @@
 require('dotenv').config({
 	path: __dirname + '/.env'
 });
+const mustacheExpress = require("mustache-express");
 //defining new variables for the file ID portion of the project
 const path = require('path');
 
@@ -8,7 +9,7 @@ const _SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.go
 
 const NodeGoogleDrive = require('node-google-drive-new');
 const YOUR_ROOT_FOLDER = '1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w',
-	PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
+PATH_TO_CREDENTIALS = path.resolve(`${__dirname}/key.json`);
 //^^ I and Z addition to vars in case looking for what might be new
 
 const {
@@ -80,7 +81,7 @@ async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 
 function find_id(all_files, file_name, submission_frequency) {
 	let lowest_fuzzy = 10000,
-		curr_distance, first_letter_dist;
+	curr_distance, first_letter_dist;
 	let file_id, return_file_name, return_dist, parent_id, type;
 	all_files.files.forEach((file) => {
 		curr_distance = edit_dist(file.name.trim(), file_name);
@@ -147,24 +148,24 @@ async function pull_main_logs(googleDriveInstance, main_folder_id) {
 		input: sheet_id: the schedule_log sheet id, which we will save in the database for loading
 		output: all_sheet_logs: the main log object of all the different forms they need filled out
 			with their names and times of fillling out (daily, weekly, on incident, etc.)
-*/
-async function create_main_log_object(folder_id) {
-	const creds_service_user = require(PATH_TO_CREDENTIALS);
-	const googleDriveInstance = new NodeGoogleDrive({
-		ROOT_FOLDER: folder_id
-	});
+			*/
+			async function create_main_log_object(folder_id) {
+				const creds_service_user = require(PATH_TO_CREDENTIALS);
+				const googleDriveInstance = new NodeGoogleDrive({
+					ROOT_FOLDER: folder_id
+				});
 
-	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+				let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
 
-	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
-	let mainlog_sheet_id = "";
-	root_files.files.forEach((item) => {
-		if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
-			mainlog_sheet_id = item.id;
-	});
+				let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
+				let mainlog_sheet_id = "";
+				root_files.files.forEach((item) => {
+					if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
+						mainlog_sheet_id = item.id;
+				});
 
-	root_files = await pull_files(googleDriveInstance, folder_id, true, true);
-	let main_logs = await pull_main_logs(googleDriveInstance, folder_id);
+				root_files = await pull_files(googleDriveInstance, folder_id, true, true);
+				let main_logs = await pull_main_logs(googleDriveInstance, folder_id);
 	// go through main logs and create a connnection to each spreadsheet
 	let pull_logs = main_logs.map(async (log, index) => {
 		return new Promise(async (resolve, reject) => {
@@ -359,17 +360,22 @@ create_main_log_object(YOUR_ROOT_FOLDER).then((sheet_answer) => {
 	functionality- check if they have submitted this form for their current values
 ------------------ need to update the value on their status page based on that, a very similar function could be used for sending status reports
 	output- status: either "need submission" or "completed"
-*/
+	*/
+	app.use(express.static(__dirname + "/public"));
+	app.set('view engine', 'mustache');
+	app.engine('mustache', mustacheExpress());
 
-app.get("/", (req, res) => {
-	res.end("Dumby server!");
+	app.get("/", function(req, res) {
+	//go to a log in page
+	//res.render("index");
+	res.sendFile(__dirname + "/views/admin.html");
 });
 
-app.listen(8080, () => {
-	console.log("server go vroom");
-});
+	app.listen(8080, () => {
+		console.log("server go vroom");
+	});
 
-module.exports = {
-	connection,
-	create_main_log_object
-};
+	module.exports = {
+		connection,
+		create_main_log_object
+	};
