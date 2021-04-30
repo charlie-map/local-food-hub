@@ -49,6 +49,4 @@ router.get("/delete-farm",(req,res) => {
 
 });
 
-	
-
 module.exports = router;
