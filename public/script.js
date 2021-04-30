@@ -1,4 +1,7 @@
-// client-side js, loaded by index.html
-// run by the browser each time the page is loaded
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
 
-console.log("hello world :o");
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}

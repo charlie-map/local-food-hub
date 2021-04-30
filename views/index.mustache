@@ -1,0 +1,29 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+<!DOCTYPE html>
+<html lang="en">
+<!-- import the webpage's stylesheet -->
+<link rel="stylesheet" href="/style.css" />
+
+<!-- import the webpage's client-side javascript file -->
+</head>
+<body>
+	<header>
+		<h1>Homepage Test</h1>
+
+	</header>
+	<main>
+		<div id = "allStati">{{#status}}
+			<div id = 'Type'>{{#type}}
+				<span id = "title">{{titleoftype}}</span>
+				<div id = 'statusoftype'>{{#row}}
+					<span id="file_name"> {{FILE_NAME}}</span>
+					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
+					<span id="fileID"> {{FILE_ID}}</span>
+					<span id="status"> {{STATUS}}</span>
+				{{/row}}</div>
+			{{/type}}</div>
+		{{/status}}</div>
+	</main>
+</body>
+</html>

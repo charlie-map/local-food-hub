@@ -1,6 +1,7 @@
 require('dotenv').config({
 	path: __dirname + '/.env'
 });
+const mustacheExpress = require("mustache-express");
 const express = require('express');
 
 // pull dependencies
@@ -16,7 +17,10 @@ const router = require('./router');
 
 const app = express();
 
+app.use(express.static(__dirname + "/public"));
 app.use('/',router);
+app.set('view engine', 'mustache');
+app.engine('mustache', mustacheExpress());
 
 create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w').then((sheet_answer) => {
 	console.log("test", sheet_answer);
@@ -24,7 +28,7 @@ create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w').then((sheet_answer) 
 });
 
 app.get("/", (req, res) => {
-	res.end("Dumby server!");
+	res.sendFile(__dirname + "/views/admin.html");
 });
 
 app.listen(8080, () => {
