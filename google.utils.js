@@ -37,29 +37,14 @@ const {
 
 const {
 	edit_dist,
-	connection
+	connection,
+	frequency_ofSubmission
 } = require("./utils.js");
 
 // Pull date libraries:
 const Sugar = require('sugar');
 const spacetime = require('spacetime');
 const moment = require('moment');
-
-// INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
-// ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
-const frequency_ofSubmission = {
-	daily: 0, // a must submit
-	weekly: 1, // must submit
-	monthly: 2, // must submit
-	seasonal: 3, // must submit
-	annual: 4, // must submit
-	onincident: 5,
-	asneeded: 6,
-	correctiveaction: 7,
-	riskassesment: 8,
-	preharvest: 9, // must submit
-	deliverydays: 10 // must submit
-}
 
 async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	return new Promise(async (resolve, reject) => {

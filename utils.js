@@ -1,5 +1,21 @@
 const mysql = require('mysql2');
 
+// INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
+// ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
+const frequency_ofSubmission = {
+	daily: 0, // a must submit
+	weekly: 1, // must submit
+	monthly: 2, // must submit
+	seasonal: 3, // must submit
+	annual: 4, // must submit
+	onincident: 5,
+	asneeded: 6,
+	correctiveaction: 7,
+	riskassesment: 8,
+	preharvest: 9, // must submit
+	deliverydays: 10 // must submit
+}
+
 // To create user on table (after making database):
 // CREATE USER 'foodhubuser'@'localhost' IDENTIFIED BY '0f28901b-2644-4109-ab06-21f55d49438f';
 // GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
@@ -64,4 +80,4 @@ function edit_dist(w1, w2) {
 	return array[array.length - 1][array[0].length - 1];
 }
 
-module.exports = { edit_dist, connection };
+module.exports = { edit_dist, connection, frequency_ofSubmission };

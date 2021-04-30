@@ -37,7 +37,7 @@ router.get("/make-farm", (req, res) => {
 router.get("/view-farms", (req, res) => {
 	connection.query("SELECT * FROM farmers", function(err, farmers){
 		if (err) console.log(err);
-		console.log(farmers);
+		
 	});
 });
 
