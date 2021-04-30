@@ -250,100 +250,108 @@ async function create_main_log_object(folder_id) {
 
 	let all_sheet_logs = [];
 	let count = 0;
-	let row_awaiting = full_row_data.map(async (log_row, index) => {
+	let row_awaiting = full_row_data.map((log_row, index) => {
 		return new Promise(async (resolve, reject) => {
-			// run through all the log data
-			// find the ones that have at least 3 items (meaning they have enough data to qualify)
-			if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
-				log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
-				// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
-				let temporary_item;
-				let lowest_fuzzy = 10000;
-				Object.keys(frequency_ofSubmission).forEach((item) => {
-					// compare item and see which we will choose
-					let distance = edit_dist(log_row._rawData[2], item);
-					if (lowest_fuzzy > distance) {
-						temporary_item = item;
-						lowest_fuzzy = distance;
-					}
-				});
-
-				log_row._rawData[2] = temporary_item;
-
-				// compare the modifed date with the files date
-				// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
-				let return_file = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
-				let use_spreadsheet; // save the index of the spreadsheet we're using for this specific file
-
-				main_logs.forEach((log, log_index) => { // find the main log connected to this file
-					if (log.parent_id == return_file[3]) {
-						use_spreadsheet = log_index;
-					}
-				});
-
-				// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
-				if (main_logs[use_spreadsheet] && return_file[0]) {
-					// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
-					let spreadsheet_index_index = -1;
-					if (return_file[1] == "form")
-						for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
-							// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
-							if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "")) < 2) {
-								spreadsheet_index_index = run;
-								break;
-							}
+			if (index < 7) {
+				// run through all the log data
+				// find the ones that have at least 3 items (meaning they have enough data to qualify)
+				if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
+					log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
+					// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
+					let temporary_item;
+					let lowest_fuzzy = 10000;
+					Object.keys(frequency_ofSubmission).forEach((item) => {
+						// compare item and see which we will choose
+						let distance = edit_dist(log_row._rawData[2], item);
+						if (lowest_fuzzy > distance) {
+							temporary_item = item;
+							lowest_fuzzy = distance;
 						}
+					});
 
-					let status = false; // if they still need to turn it in
-					if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
-						status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index)
-					} else { // dealing with a spreadsheet
-						let check_altDoc = new GoogleSpreadsheet(return_file[0]);
-						await check_altDoc.useServiceAccountAuth({
-							client_email: process.env.CLIENT_EMAIL,
-							private_key: process.env.PRIVATE_KEY
-						});
-						await check_altDoc.loadInfo();
-						//console.log("\n\n\n", check_altDoc.sheetsByIndex[0]);
-						status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2]);
+					log_row._rawData[2] = temporary_item;
+
+					// compare the modifed date with the files date
+					// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
+					let return_file = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
+					let use_spreadsheet; // save the index of the spreadsheet we're using for this specific file
+
+					main_logs.forEach((log, log_index) => { // find the main log connected to this file
+						if (log.parent_id == return_file[3]) {
+							use_spreadsheet = log_index;
+						}
+					});
+
+					// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
+					if (main_logs[use_spreadsheet] && return_file[0]) {
+						// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
+						let spreadsheet_index_index = -1;
+						if (return_file[1] == "form")
+							for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
+								main_logs
+								// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
+								if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
+									spreadsheet_index_index = run;
+									break;
+								}
+							}
+
+						let status = false; // if they still need to turn it in
+						if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
+							console.log(log_row._rawData[0], log_row._rawData[2]);
+							status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+						}
+						// } else { // dealing with a spreadsheet
+						// 	let check_altDoc = new GoogleSpreadsheet(return_file[0]);
+						// 	await check_altDoc.useServiceAccountAuth({
+						// 		client_email: process.env.CLIENT_EMAIL,
+						// 		private_key: process.env.PRIVATE_KEY
+						// 	});
+						// 	await check_altDoc.loadInfo();
+						// 	//console.log("\n\n\n", check_altDoc.sheetsByIndex[0]);
+						// 	console.log(all_dates, log_row._rawData[0], log_row._rawData[2]);
+						// 	status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2], index);
+						// }
+
+						all_sheet_logs[index] = {
+							file_name: log_row._rawData[0],
+							fileID: return_file[0],
+							status: status,
+							frequency_ofSubmission: log_row._rawData[2]
+						};
+						// console.log("Running addition", all_sheet_logs[index]);
 					}
-
-					all_sheet_logs[index] = {
-						file_name: log_row._rawData[0],
-						fileID: return_file[0],
-						status: status,
-						frequency_ofSubmission: log_row._rawData[2]
-					};
-					console.log("Running addition", all_sheet_logs[index]);
-					resolve();
 				}
 			}
+			resolve();
+
 		});
 	});
-	Promise.all(row_awaiting).then(() => {
-		return all_sheet_logs;
-	});
+	await Promise.all(row_awaiting);
+	return all_sheet_logs;
 }
 
-async function check_status(google_sheet, all_dates, indicated_date, specific_spreadsheet, specific_index) {
+function check_status(google_sheet, all_dates, indicated_date, specific_spreadsheet, specific_index, index) {
 	return new Promise(async (resolve, reject) => {
-		if (specific_spreadsheet && specific_index) {
-			console.log("pull large");
+		let spreadsheet_rows;
+		console.log("running", ((specific_spreadsheet || specific_spreadsheet == 0) && (specific_index || specific_index == 0)));
+		if ((specific_spreadsheet || specific_spreadsheet == 0) && (specific_index || specific_index == 0)) {
+			console.log("inner");
 			spreadsheet_rows = await google_sheet[specific_spreadsheet].doc.sheetsByIndex[specific_index].getRows();
+			// grab most recent value (specifically the timestamp) in the table
+			console.log(spreadsheet_rows);
+			if (!spreadsheet_rows[spreadsheet_rows.length - 1]) resolve(true); // check to make sure there are values
+			//console.log(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData);
+			let timestamp = spreadsheet_rows[spreadsheet_rows.length - 1] &&  spreadsheet_rows[spreadsheet_rows.length - 1]._rawData ? new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]) : undefined;
+			// if (all_dates[indicated_date] && timestamp) console.log("\ntest", timestamp, all_dates[indicated_date], Sugar.Date(all_dates[indicated_date]).isAfter(timestamp));
+			if (all_dates[indicated_date] && timestamp && Sugar.Date(all_dates[indicated_date]).isAfter(timestamp))
+				resolve(true);
 		} else {
-			console.log("pull smol");
 			spreadsheet_rows = await google_sheet.getRows();
 		}
 
-		console.log("PAST ROW");
-		console.log(spreadsheet_rows);
-		// grab most recent value (specifically the timestamp) in the table
-		if (!spreadsheet_rows[spreadsheet_rows.length - 1]) resolve(true); // check to make sure there are values
-		//console.log(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData);
-		let timestamp = new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]);
-		console.log("\n\n", all_dates[indicated_date]);
-		if (Sugar.Date(all_dates[indicated_date]).isAfter(timestamp))
-			resolve(true);
+		console.log("reached end?");
+		// console.log("PAST ROW", spreadsheet_rows);
 		resolve(false);
 	});
 }
