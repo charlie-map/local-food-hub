@@ -8,7 +8,7 @@ const {
 } = require("./utils");
 const {
 	create_main_log_object
-} = require("./server");
+} = require("./google.utils");
 
 const saltRounds = 10;
 const farmer = express.Router();
@@ -44,7 +44,7 @@ farmer.get("/view-status", (req, res) => {
 farmer.get("/update", async (req, res) => {
 	connection.query("SELECT * FROM farmers", async function(err, farmer) {
 		if (err) console.log(err);
-		console.log(farmer);
+		console.log("RUNN THROUGH FARMER", farmer);
 		let await_farmers = farmer.map(function(item, index) {
 			console.log(item);
 			return new Promise(async function(resolve, reject) {
@@ -52,9 +52,12 @@ farmer.get("/update", async (req, res) => {
 				let status = await create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w');
 				let stat = status.map(function(folder) {
 					return new Promise(function(end, stop) {
-						connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, frequency) VALUES (?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.status, folder.frequency_ofSubmission], function(err) {
-							if (err) console.log(err);
-							end();
+						connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
+							if (err) console.error(err);
+							connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, frequency) VALUES (?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.frequency_ofSubmission], function(err) {
+								if (err) console.log(err);
+								end();
+							});
 						});
 					});
 				});
@@ -63,6 +66,7 @@ farmer.get("/update", async (req, res) => {
 			});
 		});
 		await Promise.all(await_farmers);
+		res.end();
 	});
 });
 

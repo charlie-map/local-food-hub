@@ -280,12 +280,22 @@ async function create_main_log_object(folder_id) {
 								spreadsheet_index_index = run;
 								break;
 							}
-						}
+						};
 
-					if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
-						status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+					// don't need to check if it's one of the following:
+					/* onincident: 5,
+						asneeded: 6,
+						correctiveaction: 7,
+						riskassesment: 8 */
+					let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
+					if (frequency_ofSubmission == 5 || frequency_ofSubmission == 6 || frequency_ofSubmission == 7 || frequency_ofSubmission == 8) {
+						status = false;
 					} else {
-						status = "unknown";
+						if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
+							status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+						} else {
+							status = "unknown";
+						}
 					}
 					// } else { // dealing with a spreadsheet
 					// 	let check_altDoc = new GoogleSpreadsheet(return_file[0]);
@@ -302,7 +312,7 @@ async function create_main_log_object(folder_id) {
 
 				all_sheet_logs[index] = {
 					file_name: log_row._rawData[0],
-					fileID: return_file[0],
+					file_id: return_file[0],
 					status: status,
 					frequency_ofSubmission: log_row._rawData[2]
 				};
