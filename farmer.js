@@ -17,24 +17,27 @@ farmer.use(bodyParser.urlencoded({
 }));
 
 farmer.get("/view-status", (req, res) => {
-	connection.query("SELECT id FROM farmers WHERE username=?", req.body.username, function(err, farmer) {
+	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
-			let status = {
-				type: []
-			};
+			let type = []
 			stati.forEach((stat) => {
-				status.type[frequency_ofSubmission[stat.status]].push({ ...{
-						titleoftype: stat.status
-					},
-					...stat
+				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? { row: [] } : type[frequency_ofSubmission[stat.frequency]];
+				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
+						FILE_NAME: stat.file_name,
+						FILE_ID: stat.file_id,
+						STATUS: stat.status
+					}
 				});
 			});
-			console.log(stati);
-			res.render("index.html", {
-				status
+			type.forEach((item) => {
+				console.log(item);
+			});
+			console.log(type);
+			res.render("index", {
+				type
 			});
 		});
 	});

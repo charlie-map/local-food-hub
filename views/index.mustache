@@ -10,20 +10,17 @@
 <body>
 	<header>
 		<h1>Homepage Test</h1>
-
 	</header>
 	<main>
-		<div id = "allStati">{{#status}}
-			<div id = 'Type'>{{#type}}
-				<span id = "title">{{titleoftype}}</span>
-				<div id = 'statusoftype'>{{#row}}
-					<span id="file_name"> {{FILE_NAME}}</span>
-					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
-					<span id="fileID"> {{FILE_ID}}</span>
-					<span id="status"> {{STATUS}}</span>
-				{{/row}}</div>
-			{{/type}}</div>
-		{{/status}}</div>
+		<div id = 'allStati'>{{#type}}{{#.}}
+<!-- 			<span id = "title">{{titleoftype}}</span>
+ -->			<div id = 'statusoftype'>{{#row}}
+				<span id="file_name"> {{FILE_NAME}}</span>
+				<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
+				<span id="fileID"> {{FILE_ID}}</span>
+				<span id="status"> {{STATUS}}</span>
+			{{/row}}</div>
+		{{/.}}{{/type}}</div>
 	</main>
 </body>
 </html>
