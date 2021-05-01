@@ -52,7 +52,7 @@ farmer.get("/update", async (req, res) => {
 				let status = await create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w');
 				let stat = status.map(function(folder) {
 					return new Promise(function(end, stop) {
-						connection.query("INSERT INTO status (farmer_id,file_name,file_id,status,frequency) VALUES (?,?,?,?,?)", [item.id, folder.file_name, folder.status, folder.frequency_ofSubmission], function(err) {
+						connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, frequency) VALUES (?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.status, folder.frequency_ofSubmission], function(err) {
 							if (err) console.log(err);
 							end();
 						});
