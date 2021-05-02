@@ -39,7 +39,7 @@ app.engine('mustache', mustacheExpress());
 // });
 
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/views/admin.html");
+	res.sendFile(__dirname + "/views/login.html");
 });
 
 //login stuff
