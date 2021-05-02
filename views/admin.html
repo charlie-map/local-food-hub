@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/admin.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/admin.css">
 </head>
 <body>
 
-<h2>Admin Page</h2>
-<!-- <p>Ayo we got some stuff goin on</p> -->
-<!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
+  <h2>Admin Page</h2>
+  <!-- <p>Ayo we got some stuff goin on</p> -->
+  <!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
+  
+    <form action="/view-farms" method="get">
+      <button class="view-button">View Farms</button>
+    </form>
 
-<form action="/view-farms" method="get">
-  <button class="view-button">View Farms</button>
-</form>
+  <button class="open-button" onclick="openForm()">Add Farm</button>
 
-<button class="open-button" onclick="openForm()">Add Farm</button>
+  <div class="form-popup" id="myForm">
+    <form action="/view-farms" class="form-container">
+      <h1>Add Farm</h1>
 
-<div class="form-popup" id="myForm">
-  <form action="/view-farms" class="form-container">
-    <h1>Add Farm</h1>
+      <label for="farmname"><b>Farm Name</b></label>
+      <input type="text" placeholder="Enter Farm Name" name="farmname" required>
 
-    <label for="farmname"><b>Farm Name</b></label>
-    <input type="text" placeholder="Enter Farm Name" name="farmname" required>
+      <label for="username"><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" name="username" required>
 
-    <label for="username"><b>Username</b></label>
-    <input type="text" placeholder="Enter Username" name="username" required>
+      <label for="initial_password"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
 
-    <label for="initial_password"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required>
+      <label for="root-folder"><b>Main Folder ID</b></label>
+      <input type="text" placeholder="Enter Folder ID" name="root-folder" required>
 
-    <label for="root-folder"><b>Main Folder ID</b></label>
-    <input type="text" placeholder="Enter Folder ID" name="root-folder" required>
+      <button type="submit" class="btn">Submit</button>
+      <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+  </div>
 
-    <button type="submit" class="btn">Submit</button>
-    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-  </form>
-</div>
+  <script>
+    function openForm() {
+      document.getElementById("myForm").style.display = "block";
+    }
 
-<script>
-function openForm() {
-  document.getElementById("myForm").style.display = "block";
-}
-
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
-}
-</script>
+    function closeForm() {
+      document.getElementById("myForm").style.display = "none";
+    }
+  </script>
 
 </body>
 </html>
