@@ -1,34 +1,66 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser')
 
-const { connection } = require("./utils");
-const { create_main_log_object } = require("./google.utils");
+const {
+	connection,
+	frequency_ofSubmission
+} = require("./utils");
+const {
+	create_main_log_object
+} = require("./google.utils");
 
 const saltRounds = 10;
-const farmer = express.Router()
+const farmer = express.Router();
+farmer.use(bodyParser.urlencoded({
+	extended: true
+}));
 
 farmer.get("/view-status", (req, res) => {
- connection.query("SELECT root_folder FROM farmers", function(err, farmer){
-		if (err) console.log(err);
-		console.log(farmer);
+	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
+		if (err) console.error(err);
+		// go into the status table and grab values from there
+		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
+			if (err) console.error(err);
+			let type = []
+			stati.forEach((stat) => {
+				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? { row: [] } : type[frequency_ofSubmission[stat.frequency]];
+				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
+						FILE_NAME: stat.file_name,
+						FILE_ID: stat.file_id,
+						STATUS: stat.status
+					}
+				});
+			});
+			type.forEach((item) => {
+				console.log(item);
+			});
+			console.log(type);
+			res.render("index", {
+				type
+			});
+		});
 	});
 
 });
 
-farmer.get ("/update", async (req, res) => {
-	connection.query("SELECT * FROM farmers", async function(err, farmer){
+farmer.get("/update", async (req, res) => {
+	connection.query("SELECT * FROM farmers", async function(err, farmer) {
 		if (err) console.log(err);
-		console.log(farmer);
-		let await_farmers = farmer.map(function (item, index) {
+		console.log("RUNN THROUGH FARMER", farmer);
+		let await_farmers = farmer.map(function(item, index) {
 			console.log(item);
-			return new Promise (async function (resolve, reject){
+			return new Promise(async function(resolve, reject) {
 
 				let status = await create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w');
-				let stat = status.map(function (folder){
-					return new Promise (function (end, stop){
-						connection.query("INSERT INTO status (farmer_id,file_name,file_id,status,frequency) VALUES (?,?,?,?,?)", [item.id, folder.file_name, folder.status, folder.frequency_ofSubmission], function (err){
-							if (err) console.log(err);
-							end();
+				let stat = status.map(function(folder) {
+					return new Promise(function(end, stop) {
+						connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
+							if (err) console.error(err);
+							connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, frequency) VALUES (?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.frequency_ofSubmission], function(err) {
+								if (err) console.log(err);
+								end();
+							});
 						});
 					});
 				});
@@ -37,6 +69,7 @@ farmer.get ("/update", async (req, res) => {
 			});
 		});
 		await Promise.all(await_farmers);
+		res.end();
 	});
 });
 
