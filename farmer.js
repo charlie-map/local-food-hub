@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 
 const {
 	connection,
+	isLoggedIn,
 	frequency_ofSubmission
 } = require("./utils");
 const {
@@ -16,7 +17,7 @@ farmer.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-farmer.get("/view-status", (req, res) => {
+farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there

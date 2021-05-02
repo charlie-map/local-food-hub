@@ -57,6 +57,38 @@ function printMultiArray(arr) {
 	}
 }
 
+function isLoggedIn(req, res, next) {
+    if (!req.cookies && !req.cookies.token) {
+        res.redirect('/');
+        return;
+    }
+    connection.query('SELECT * FROM uuid LEFT JOIN user ON uuid.id = user.id WHERE token = ?;', [req.cookies.token], (err, row) => {
+        if (err || row.length == 0) {
+            res.end("begone");
+            return;
+        }
+        let expiry = new Date(row[0].expiry);
+        let now = new Date();
+        if (now > expiry) {
+            res.redirect('/');
+        } else {
+            //updating the server each time they do *something* 
+            let updateExpiry = new Date();
+            updateExpiry.setSeconds(updateExpiry.getSeconds() + 3600);
+            req.username = row[0].username;
+            connection.query('UPDATE uuid SET expiry = ? WHERE token = ?', [updateExpiry, req.cookies.token], (err) => {
+                res.cookie("token", req.cookies.token, {
+                    expires: new Date(updateExpiry)
+                });
+                next();
+            });
+        }
+    });
+
+
+}
+
+
 function min(values) {
 	let min = 100000;
 	for (value in values) {
@@ -80,4 +112,4 @@ function edit_dist(w1, w2) {
 	return array[array.length - 1][array[0].length - 1];
 }
 
-module.exports = { edit_dist, connection, frequency_ofSubmission };
+module.exports = { edit_dist, isLoggedIn, connection, frequency_ofSubmission };
