@@ -314,6 +314,7 @@ async function create_main_log_object(folder_id) {
 					file_name: log_row._rawData[0],
 					file_id: return_file[0],
 					status: status,
+					file_type: return_file[1],
 					frequency_ofSubmission: log_row._rawData[2]
 				};
 			}
