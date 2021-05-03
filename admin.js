@@ -1,7 +1,7 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 
-const { connection, isLoggedIn } = require("./utils");
+
+const { connection, bcrypt, isLoggedIn } = require("./utils");
 
 
 const saltRounds = 10;
@@ -23,7 +23,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
 
 const router = express.Router()
 
-router.get("/make-farm", isLoggedIn, (req, res) => {
+router.get("/make-farm", (req, res) => {
 	let test = {farm_name: "test", email: "tastfarm@gmail.com", password: "testpassword", root_folder: "testfarmfolder"}
 	bcrypt.hash(test.password, saltRounds, function(err, hash) {
 		test.password = hash;
