@@ -18,7 +18,7 @@ CREATE TABLE status (
 	file_name VARCHAR(255) NOT NULL,
 	file_id VARCHAR(255),
 	status VARCHAR(255) NOT NULL DEFAULT 'unknown',
-	file_type VARCHAR(255) NOT NULL DEFAULT 'forms',
+	file_type VARCHAR(255) NOT NULL DEFAULT 'form',
 	frequency VARCHAR(255) NOT NULL DEFAULT 'daily',
 	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );
