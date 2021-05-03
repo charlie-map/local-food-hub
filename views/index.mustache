@@ -14,13 +14,23 @@
 	<main>
 		<div id = 'allStati'>{{#type}}{{#.}}
 <!-- 			<span id = "title">{{titleoftype}}</span>
- -->			<div id = 'statusoftype'>{{#row}}
-				<span id="file_name"> {{FILE_NAME}}</span>
-				<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
-				<span id="fileID"> {{FILE_ID}}</span>
-				<span id="status"> {{STATUS}}</span>
-			{{/row}}</div>
-		{{/.}}{{/type}}</div>
-	</main>
+-->			<div id = 'statusoftype'>{{#row}}
+	<span id="file_name"> {{FILE_NAME}}</span>
+	<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
+	<span id="fileID"> {{FILE_ID}}</span>
+	<span id="status"> {{STATUS}}</span>
+{{/row}}</div>
+{{/.}}{{/type}}</div>
+
+<!-- <script id="user-template" type="text/template">
+	<table border="1"  id = "ModuleUserTable">
+		<tr>
+			<td>{{FILE_NAME}}</td>
+			<td>{{FILE_ID}}</td>
+			<td>{{STATUS}}</td>
+		</tr>
+	</table>
+</script> -->
+</main>
 </body>
 </html>

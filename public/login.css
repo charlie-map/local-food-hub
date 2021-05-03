@@ -17,7 +17,7 @@ body {
   font-size: 20px;
   }*/
 
-  .view-button {
+/*  .view-button {
     border-collapse:separate;
     border-radius:10px;
     -moz-border-radius:6px;
@@ -29,7 +29,7 @@ body {
     cursor: pointer;
     display: block;
     margin: 0 auto;
-  }
+  }*/
 
   button:hover {
     background-color: #006400;
@@ -47,20 +47,21 @@ body {
     font-size: 20px;
     border: 2px solid #006400;  
     cursor: pointer;
-    opacity: 0.8;
-    position: fixed;
-    bottom: 23px;
-    right: 28px;
+    /*opacity: 0.8;*/
+    position: absolute;
     width: 280px;
+    height: 100px;
+    right: 630px;
+    margin-top: 300px;
   }
 
   /* The popup form - hidden by default */
   .form-popup {
     display: none;  
-    position: fixed;
+    position: absolute;
     bottom: 0;
-    right: 15px;
-    border: 3px solid #f1f1f1;
+    right: 610px;
+    margin-bottom: 200px;
     z-index: 9;
   }
 

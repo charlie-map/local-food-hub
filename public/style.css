@@ -2,26 +2,39 @@
 
 /** {
   box-sizing: border-box;
-}*/
+  }*/
 
-body {
-  font-family: verdana;
-  background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
-  background-repeat: no-repeat;
-  background-size: cover;
-  margin: 2em 1em;
-  line-height: 2.5em;
-  opacity: 0.9;
-}
+  body {
+    font-family: verdana;
+    background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 2em 1em;
+    line-height: 2.5em;
+    opacity: 0.9;
+  }
 
-h1 {
-  font-weight: bold;
-  font-size: 50px;
-  text-align: center;
-  color: #006400;
-  line-height: 1.1;
-}
+  h1 {
+    font-weight: bold;
+    font-size: 50px;
+    text-align: center;
+    color: #006400;
+    line-height: 1.1;
+  }
 
+  #allStati {
+    margin-top: none;
+    position: static;
+    background-color: #98fb98;
+    width: 85%;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding: 50px;
+    border-radius: 18px;
+    color: #001f3f;
+    font-size: 20px;
+    box-shadow: 6px 5px 24px #666666;
+  }
 /*form {
   background-color: #f5fff5;
   margin: auto;
@@ -29,39 +42,39 @@ h1 {
   grid-gap: 1em;
   padding: 2em;
   max-width: 100ch;
-}*/
+  }*/
 
-table, th, td {
-  padding: 10px;
-  text-align: center;
-  margin: auto;
-}
+  table, th, td {
+    padding: 10px;
+    text-align: center;
+    margin: auto;
+  }
 
-table {
-  border-collapse:separate;
-  border-radius:10px;
-  -moz-border-radius:6px;
-  background-color: #F5F5F5;
-}
+  table {
+    border-collapse:separate;
+    border-radius:10px;
+    -moz-border-radius:6px;
+    background-color: #F5F5F5;
+  }
 
-#status th {
-  background-color: #F5F5F5;
-  font-size: 25px;
-  color: #303030;
-}
+  #status th {
+    background-color: #F5F5F5;
+    font-size: 25px;
+    color: #303030;
+  }
 
-#status tr {
-  background-color: #E8E8E8;
-  font-size: 17px;
-}
+  #status tr {
+    background-color: #E8E8E8;
+    font-size: 17px;
+  }
 
-#status tr:nth-child(even) {
-  background-color: #B3FFC5;
-}
+  #status tr:nth-child(even) {
+    background-color: #B3FFC5;
+  }
 
-label {
-  font-weight: bold;
-}
+  label {
+    font-weight: bold;
+  }
 
 /*input {
   border: 1px solid silver;
@@ -70,7 +83,7 @@ label {
   margin-bottom: 10px;
   padding: 5px;
   width: 100%;
-}*/
+  }*/
 
 /*form button {
   background-color: #bbbbf2;
@@ -91,4 +104,4 @@ footer {
   margin-top: 3em;
   padding-top: 1.5em;
   border-top: 1px solid lightgrey;
-}*/
+  }*/

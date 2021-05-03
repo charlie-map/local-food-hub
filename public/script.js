@@ -1,7 +1,8 @@
-function openForm() {
-  document.getElementById("myForm").style.display = "block";
-}
+var text = '[{"File Name":"John", "File ID":"john@gmail.com"},{"File Name":"Mary", "File ID":"mary@gmail.com"}]'
+var obj = {people: JSON.parse(text)};
 
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
-}
+$(document).ready(function() {
+    var template = $('#user-template').html();
+    var info = Mustache.render(template, obj);
+    $('#ModuleUserTable').append(info);
+});
