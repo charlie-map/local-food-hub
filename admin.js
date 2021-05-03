@@ -1,7 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 
-const { connection } = require("./utils");
+const { connection, isLoggedIn } = require("./utils");
+
 
 const saltRounds = 10;
 const myPlaintextPassword = 'foodhub';
@@ -22,7 +23,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
 
 const router = express.Router()
 
-router.get("/make-farm", (req, res) => {
+router.get("/make-farm", isLoggedIn, (req, res) => {
 	let test = {farm_name: "test", email: "tastfarm@gmail.com", password: "testpassword", root_folder: "testfarmfolder"}
 	bcrypt.hash(test.password, saltRounds, function(err, hash) {
 		test.password = hash;
@@ -34,14 +35,14 @@ router.get("/make-farm", (req, res) => {
 	});
 });
 
-router.get("/view-farms", (req, res) => {
+router.get("/view-farms", isLoggedIn, (req, res) => {
 	connection.query("SELECT * FROM farmers", function(err, farmers){
 		if (err) console.log(err);
 		
 	});
 });
 
-router.get("/delete-farm",(req,res) => {
+router.get("/delete-farm", isLoggedIn, (req,res) => {
 	connection.query("DELETE FROM farmers WHERE email = 'tastfarm@gmail.com' ", function(err,farmers){
 		if (err) console.log(err);
 		console.log("yay");
