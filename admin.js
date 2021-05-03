@@ -22,16 +22,21 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
 router.post("/view-farms", isLoggedIn, (req, res) => {
 	connection.query("SELECT * FROM farmers", function(err, farmers){
 		if (err) console.log(err);
-		
+		let row = [];
+		farmers.forEach(farm => {
+			row.push({ farm_name: farm.farm_name, email: farm.email, root_folder: farm.root_folder });
+		});
+		res.render('farms', {
+			row
+		});
 	});
 });
 
-router.post("/delete-farm", isLoggedIn, (req,res) => {
-	connection.query("DELETE FROM farmers WHERE email = 'tastfarm@gmail.com' ", function(err,farmers){
+router.get("/delete-farm", isLoggedIn, (req,res) => {
+	connection.query("DELETE FROM farmers WHERE email=?", req.body.email, function(err,farmers){
 		if (err) console.log(err);
-		console.log("yay");
+		res.end();
 	});
-
 });
 
 module.exports = router;
