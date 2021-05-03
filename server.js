@@ -12,13 +12,11 @@ const {
 const {
 	create_main_log_object
 } = require('./google.utils.js');
-
 const router = require('./router');
 
 const app = express();
 
 const cookieParser = require("cookie-parser");
-
 const bodyParser = require("body-parser");
 
 const {

@@ -38,7 +38,6 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 			type.forEach((item) => {
 				console.log(item);
 			});
-			console.log(type);
 			res.render("index", {
 				type
 			});
