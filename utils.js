@@ -60,13 +60,13 @@ function printMultiArray(arr) {
 }
 
 function isLoggedIn(req, res, next) {
-	console.log(req.cookies);
     if (!req.cookies && !req.cookies.token) {
         res.redirect('/');
         return;
     }
-    connection.query('SELECT * FROM uuid LEFT JOIN user ON uuid.id = user.id WHERE token = ?;', [req.cookies.token], (err, row) => {
+    connection.query('SELECT * FROM uuid LEFT JOIN farmers ON uuid.farmer_id = id WHERE token = ?;', [req.cookies.token], (err, row) => {
         if (err || row.length == 0) {
+        	console.log("shit");
             res.redirect('/')
             return;
         }

@@ -20,13 +20,14 @@ farmer.use(bodyParser.urlencoded({
 farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
+		console.log(farmer);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
-			let type = []
+			let type = [];
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					row: []
+					titleoftype: stat.frequency, row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,
@@ -38,7 +39,6 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 			type.forEach((item) => {
 				console.log(item);
 			});
-			console.log(type);
 			res.render("index", {
 				type
 			});

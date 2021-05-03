@@ -15,13 +15,11 @@ const {
 const {
     create_main_log_object
 } = require('./google.utils.js');
-
 const router = require('./router');
 
 const app = express();
 
 const cookieParser = require("cookie-parser");
-
 const bodyParser = require("body-parser");
 
 const {
@@ -67,7 +65,10 @@ app.post("/login", function(req, res) {
                 let token = uuid();
                 //we need to remove the old tokens first--if they exist 
                 connection.query('DELETE FROM uuid WHERE farmer_id = ?', [row[0].farmer_id], (err) => {
-                    connection.query('INSERT INTO uuid(token, id, expiry) values(?,?,?)', [token, row[0].farmer_id, now], (err) => {
+                    connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].farmer_id, now], (err) => {
+                        if (err){
+                            console.log(err);
+                        }
                         res.cookie("token", token);
                         if (row[0].account_type == 0) {
                             res.redirect('/farm/view-status');
@@ -77,7 +78,6 @@ app.post("/login", function(req, res) {
                             res.redirect('/admin/view-farms');
                         }
                     });
-
                 });
             } else {
                 res.sendFile(__dirname + '/views/login.html');
