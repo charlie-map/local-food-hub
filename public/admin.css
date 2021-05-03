@@ -47,7 +47,7 @@ h2{
     font-size: 20px;
     border: 2px solid #006400;  
     cursor: pointer;
-    opacity: 0.8;
+/*    opacity: 0.8;*/
     position: fixed;
     bottom: 23px;
     right: 28px;

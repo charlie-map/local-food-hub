@@ -68,7 +68,7 @@ app.post("/login", function(req, res) {
             connection.query('DELETE FROM uuid WHERE id = ?', [row[0].farmer_id], (err) => {
                 connection.query('INSERT INTO uuid(token, id, expiry) values(?,?,?)', [token, row[0].farmer_id, now], (err) => {
                     res.cookie("token", token);
-                    res.redirect('/Farms/view-status');
+                    res.redirect('/farms/view-status');
 
                 });
 

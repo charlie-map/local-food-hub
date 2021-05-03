@@ -1,6 +1,6 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-image: url("https://www.dailysignal.com/wp-content/uploads/FarmRows-1250x650.jpg");
+  background-color: #CCFFCC;
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -44,7 +44,7 @@ body {
     background-color: white;
     color: #006400;
     padding: 16px 20px;
-    font-size: 20px;
+    font-size: 30px;
     border: 2px solid #006400;  
     cursor: pointer;
     /*opacity: 0.8;*/
