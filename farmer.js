@@ -5,7 +5,8 @@ const bodyParser = require('body-parser')
 const {
 	connection,
 	isLoggedIn,
-	frequency_ofSubmission
+	frequency_ofSubmission,
+	edit_dist
 } = require("./utils");
 const {
 	create_main_log_object
@@ -34,7 +35,7 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
-	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
+	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", "admin", function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
@@ -42,7 +43,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 			let type = []
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					row: []
+					titleoftype: find_type(frequencies_title, stat.frequency), row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,
@@ -55,13 +56,23 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 				console.log(item);
 			});
 			res.render("index", {
+				farm_name: farmer[0].farm_name,
 				type
 			});
 		});
 	});
 });
 
-farmer.post("/ignore");
+farmer.get("/ignore/:username/:url", (req, res) => {
+	connection.query("SELECT id FROM farmers WHERE farm_name=?", req.params.username, (err, farm_id) => {
+		if (err) console.error(err);
+		let params = req.params.url.split("/");
+		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, params[1].substring(0, params[1].length)], (err) => {
+			if (err) console.error(err);
+			res.end();
+		});
+	});
+});
 
 farmer.get("/update", async (req, res) => {
 	connection.query("SELECT * FROM farmers", async function(err, farmer) {

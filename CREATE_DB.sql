@@ -6,12 +6,13 @@ USE foodhub;
 CREATE TABLE farmers (
 	id INT AUTO_INCREMENT,
 	farm_name VARCHAR(255) NOT NULL,
+	username VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	password VARCHAR(60) NOT NULL,
 	root_folder VARCHAR(255) NOT NULL,
 	account_type TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(id),
-	UNIQUE INDEX `unique_farmer` (`farm_name`, `email`)
+	UNIQUE INDEX `unique_farmer` (`username`, `email`)
 );
 
 CREATE TABLE status (

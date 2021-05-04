@@ -42,7 +42,8 @@ app.get("/", (request, response) => {
 });
 //could be some bugs with /login--I think the page isn't what we intended. I think "/" is what we've interpreted as /login
 app.post("/login", function(req, res) {
-    connection.query('SELECT * FROM farmers WHERE farm_name = ?', [req.body.username], (err, row) => {
+    console.log(req.body);
+    connection.query('SELECT * FROM farmers WHERE username=?', [req.body.username], (err, row) => {
         if (err || row.length == 0) {
             res.sendFile(__dirname + '/views/login.html');
             return;
@@ -65,7 +66,7 @@ app.post("/login", function(req, res) {
                             res.redirect('/farm/view-status');
                         } else {
                             //if accounttype !0, send to admin
-                            res.sendFile(__dirname + "/views/admin.html");
+                            res.redirect('/admin');
                         }
                     });
                 });
