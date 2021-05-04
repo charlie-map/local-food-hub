@@ -305,7 +305,7 @@ async function create_main_log_object(folder_id) {
 						if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
 							status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
 						} else {
-							status = "unknown";
+							status = true;
 						}
 					}
 					// } else { // dealing with a spreadsheet
@@ -318,7 +318,7 @@ async function create_main_log_object(folder_id) {
 					// 	status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2], index);
 					// }
 				} else {
-					status = "unknown";
+					status = true;
 				}
 
 				all_sheet_logs[index] = {
