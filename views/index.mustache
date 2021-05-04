@@ -9,21 +9,35 @@
 </head>
 <body>
 	<header>
-		<h1>Homepage Test</h1>
+		<h1>Homepage for {{farm_name}}</h1>
 	</header>
 	<main>
 		<div id = 'allStati'>{{#type}}{{#.}}
 			<ul id="list">
- 			<span id = "title">{{titleoftype}}</span>
-			<div id = 'statusoftype'>{{#row}}
-			<span id="file_name"> {{FILE_NAME}}</span>
-	<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
-			<button id="fileID" onclick="{{FILE_ID}}">Fill out</button>
-			<span id="status"> {{STATUS}}</span>
-			<br>
-		{{/row}}</div>
-	</ul>
-	{{/.}}{{/type}}</div>
-</main>
+				<span id = "title">{{titleoftype}}</span>
+				<div id = 'statusoftype'>{{#row}}
+					<span id="file_name"> {{FILE_NAME}}</span>
+					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
+					<button id="fileID" onclick="{{FILE_ID}}">Fill out</button>
+					<span id="status"> {{STATUS}}</span>
+					<br>
+				{{/row}}</div>
+			</ul>
+		{{/.}}{{/type}}</div>
+
+<!-- 		<table border="1">
+			<tr>
+				<th>File Name</th>
+				<th>Status</th>
+			</tr>
+			<tr id = "ModuleUserTable"> 
+			</tr> 
+		</table>
+		<script id="user-template" type="text/template">
+			<td>{{FILE_NAME}}</td>
+			<td>{{STATUS}}</td>
+		</script> -->
+		
+	</main>
 </body>
 </html>

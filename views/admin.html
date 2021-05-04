@@ -10,9 +10,9 @@
   <!-- <p>Ayo we got some stuff goin on</p> -->
   <!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
   
-    <form action="/view-farms" method="get">
-      <button class="view-button">View Farms</button>
-    </form>
+  <form method="get" action="/view-farms">
+    <button class="view-button">View Farms</button>
+  </form>
 
   <button class="open-button" onclick="openForm()">Add Farm</button>
 
@@ -21,13 +21,16 @@
       <h1>Add Farm</h1>
 
       <label for="farmname"><b>Farm Name</b></label>
-      <input type="text" placeholder="Enter Farm Name" name="farmname" required>
+      <input type="text" placeholder="Ex. Bellair Farm" name="farmname" required>
 
       <label for="username"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="username" required>
+      <input type="text" placeholder="Ex. bellair_farm" name="username" required>
+
+      <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Ex. jsmith@gmai.com" name="email" required>
 
       <label for="initial_password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
+      <input type="password" placeholder="Ex. password165!" name="psw" required>
 
       <label for="root-folder"><b>Main Folder ID</b></label>
       <input type="text" placeholder="Enter Folder ID" name="root-folder" required>
