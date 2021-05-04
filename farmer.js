@@ -75,7 +75,7 @@ farmer.get("/ignore/:username/:url", (req, res) => {
 });
 
 farmer.get("/update", async (req, res) => {
-	connection.query("SELECT * FROM farmers", async function(err, farmer) {
+	connection.query("SELECT * FROM farmers WHERE account_type=0", async function(err, farmer) {
 		if (err) console.log(err);
 		let await_farmers = farmer.map(function(item, index) {
 			return new Promise(async function(resolve, reject) {

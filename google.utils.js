@@ -135,6 +135,7 @@ async function create_main_log_object(folder_id) {
 		ROOT_FOLDER: folder_id
 	});
 
+	console.log(folder_id);
 	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
 
 	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
