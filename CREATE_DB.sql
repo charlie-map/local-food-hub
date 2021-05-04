@@ -10,7 +10,8 @@ CREATE TABLE farmers (
 	password VARCHAR(60) NOT NULL,
 	root_folder VARCHAR(255) NOT NULL,
 	account_type TINYINT NOT NULL DEFAULT 0,
-	PRIMARY KEY(id)
+	PRIMARY KEY(id),
+	UNIQUE INDEX `unique_farmer` (`farm_name`, `email`)
 );
 
 CREATE TABLE status (
@@ -20,12 +21,13 @@ CREATE TABLE status (
 	status VARCHAR(255) NOT NULL DEFAULT 'unknown',
 	file_type VARCHAR(255) NOT NULL DEFAULT 'form',
 	frequency VARCHAR(255) NOT NULL DEFAULT 'daily',
+	ignore_notifier TINYINT NOT NULL DEFAULT 0,
 	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE uuid (
 	farmer_id INT,
-	token, VARCHAR(255),
+	token VARCHAR(255),
 	expiry DATETIME,
-	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );

@@ -17,17 +17,32 @@ farmer.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-farmer.get("/view-status", /*isLoggedIn,*/ (req, res) => {
+let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On Incident", "As Needed",
+	"Corrective Action", "Risk Assessment", "Preharvest", "Delivery Days"
+];
+
+function find_type(frequencies, stat_value) {
+	let lowest = 1000, lowest_pos = 0, dist;
+	frequencies.forEach((type, index) => {
+		dist = edit_dist(type, stat_value);
+		if (dist < lowest) {
+			lowest = dist;
+			lowest_pos = index;
+		}
+	});
+	return frequencies[lowest_pos];
+}
+
+farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
-		console.log(farmer);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
-			let type = [];
+			let type = []
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					titleoftype: stat.frequency, row: []
+					row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,
@@ -44,8 +59,9 @@ farmer.get("/view-status", /*isLoggedIn,*/ (req, res) => {
 			});
 		});
 	});
-
 });
+
+farmer.post("/ignore");
 
 farmer.get("/update", async (req, res) => {
 	connection.query("SELECT * FROM farmers", async function(err, farmer) {
@@ -54,7 +70,7 @@ farmer.get("/update", async (req, res) => {
 			return new Promise(async function(resolve, reject) {
 
 				try {
-					let status = await create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w');
+					let status = await create_main_log_object(item.root_folder);
 					let stat = status.map(function(folder) {
 						return new Promise(function(end, stop) {
 							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
