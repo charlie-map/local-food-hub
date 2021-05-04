@@ -29,6 +29,7 @@ h2{
     cursor: pointer;
     display: block;
     margin: 0 auto;
+    display: block;
   }
 
   button:hover {

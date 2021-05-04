@@ -35,7 +35,7 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
-	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", "admin", function(err, farmer) {
+	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", "test", function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
@@ -48,7 +48,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,
 						FILE_ID: "docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
-						STATUS: stat.status
+						STATUS: stat.status == "true" ? true : false
 					}
 				});
 			});
