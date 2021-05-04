@@ -5,8 +5,7 @@ const bodyParser = require('body-parser')
 const {
 	connection,
 	isLoggedIn,
-	frequency_ofSubmission,
-	edit_dist
+	frequency_ofSubmission
 } = require("./utils");
 const {
 	create_main_log_object
@@ -37,14 +36,12 @@ function find_type(frequencies, stat_value) {
 farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
-		console.log(farmer);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
-			let type = [];
+			let type = []
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					titleoftype: find_type(frequencies_title, stat.frequency),
 					row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
