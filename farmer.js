@@ -59,8 +59,9 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 			});
 		});
 	});
-
 });
+
+farmer.post("/ignore");
 
 farmer.get("/update", async (req, res) => {
 	connection.query("SELECT * FROM farmers", async function(err, farmer) {
