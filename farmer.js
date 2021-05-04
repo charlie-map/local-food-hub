@@ -5,7 +5,8 @@ const bodyParser = require('body-parser')
 const {
 	connection,
 	isLoggedIn,
-	frequency_ofSubmission
+	frequency_ofSubmission,
+	edit_dist
 } = require("./utils");
 const {
 	create_main_log_object
@@ -17,6 +18,22 @@ farmer.use(bodyParser.urlencoded({
 	extended: true
 }));
 
+let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On Incident", "As Needed",
+	"Corrective Action", "Risk Assessment", "Preharvest", "Delivery Days"
+];
+
+function find_type(frequencies, stat_value) {
+	let lowest = 1000, lowest_pos = 0, dist;
+	frequencies.forEach((type, index) => {
+		dist = edit_dist(type, stat_value);
+		if (dist < lowest) {
+			lowest = dist;
+			lowest_pos = index;
+		}
+	});
+	return frequencies[lowest_pos];
+}
+
 farmer.get("/view-status", /*isLoggedIn,*/ (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
@@ -27,7 +44,8 @@ farmer.get("/view-status", /*isLoggedIn,*/ (req, res) => {
 			let type = [];
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					titleoftype: stat.frequency, row: []
+					titleoftype: find_type(frequencies_title, stat.frequency),
+					row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,

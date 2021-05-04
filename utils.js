@@ -4,7 +4,9 @@ const mysql = require('mysql2');
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
 const frequency_ofSubmission = {
 	daily: 0, // a must submit
+	daily_type: "Daily",
 	weekly: 1, // must submit
+	daily_type: "Weekly",
 	monthly: 2, // must submit
 	seasonal: 3, // must submit
 	annual: 4, // must submit
