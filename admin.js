@@ -18,7 +18,6 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
     let test = { farm_name: req.body.farmname, username: req.body.username, email: req.body.email, password: req.body.psw, root_folder: req.body["root-folder"] };
 	bcrypt.hash(req.body.psw, saltRounds, function(err, hash) {
 		test.password = hash;
-		console.log(test);
 		connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE farm_name=VALUES(farm_name), username=VALUES(username), password=VALUES(password), root_folder=VALUES(root_folder)", Object.values(test), function (err) {
 			if (err) console.log(err);
 			res.redirect("/admin");

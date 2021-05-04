@@ -35,7 +35,7 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
-	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", "test", function(err, farmer) {
+	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
@@ -52,9 +52,9 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					}
 				});
 			});
-			type.forEach((item) => {
-				console.log(item);
-			});
+			// type.forEach((item) => {
+			// 	console.log(item);
+			// });
 			res.render("index", {
 				farm_name: farmer[0].farm_name,
 				type
@@ -63,10 +63,14 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 	});
 });
 
-farmer.get("/ignore/:username/:url", (req, res) => {
-	connection.query("SELECT id FROM farmers WHERE farm_name=?", req.params.username, (err, farm_id) => {
+farmer.get("/fill-out/:url", isLoggedIn, (req, res) => {
+
+});
+
+farmer.get("/ignore", isLoggedIn, (req, res) => {
+	connection.query("SELECT id FROM farmers WHERE farm_name=?", req.query.username, (err, farm_id) => {
 		if (err) console.error(err);
-		let params = req.params.url.split("/");
+		let params = req.query.url.split("/");
 		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, params[1].substring(0, params[1].length)], (err) => {
 			if (err) console.error(err);
 			res.end();
