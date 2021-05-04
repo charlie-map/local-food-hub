@@ -12,6 +12,10 @@
 		<h1>Homepage for {{farm_name}}</h1>
 	</header>
 	<main>
+		<form action="/login" method="get">
+			<button class="view-button">View Farms</button>
+		</form>
+
 		<div id = 'allStati'>{{#type}}{{#.}}
 			<ul id="list">
 				<span id = "title">{{titleoftype}}</span>

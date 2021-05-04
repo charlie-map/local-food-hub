@@ -62,6 +62,7 @@ app.post("/login", function(req, res) {
                             console.log(err);
                         }
                         res.cookie("token", token);
+                        console.log(row[0].account_type);
                         if (row[0].account_type == 0) {
                             console.log("ah");
                             res.redirect('/farm/view-status?username=' + req.body.username);
