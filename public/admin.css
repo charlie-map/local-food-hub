@@ -7,11 +7,9 @@ body {
 
 h2{
   font-size: 50px;
+  color: #7d0849;
   text-align: center;
-  color: #006400;
-  padding-top: 40px;
 }
-
 /*p{
   text-align: center;
   font-size: 20px;
@@ -21,9 +19,9 @@ h2{
     border-collapse:separate;
     border-radius:10px;
     -moz-border-radius:6px;
-    border: 2px solid #006400;
+    border: 2px solid #7d0849;
     background-color: white;
-    color: #006400;
+    color: #7d0849;
     padding: 30px 40px;
     font-size: 25px;
     cursor: pointer;
@@ -32,7 +30,7 @@ h2{
   }
 
   button:hover {
-    background-color: #006400;
+    background-color: #7d0849;
     color: white;
   }
 
@@ -42,16 +40,15 @@ h2{
     border-radius:10px;
     -moz-border-radius:6px;
     background-color: white;
-    color: #006400;
+    color: #7d0849;
     padding: 16px 20px;
     font-size: 20px;
-    border: 2px solid #006400;  
-    cursor: pointer;
-/*    opacity: 0.8;*/
-    position: fixed;
+    border: 2px solid #7d0849;  
+    cursor: pointer
     bottom: 23px;
     right: 28px;
     width: 280px;
+    position: fixed;
   }
 
   /* The popup form - hidden by default */
