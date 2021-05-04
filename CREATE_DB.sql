@@ -25,7 +25,7 @@ CREATE TABLE status (
 
 CREATE TABLE uuid (
 	farmer_id INT,
-	token, VARCHAR(255),
+	token VARCHAR(255),
 	expiry DATETIME,
-	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );

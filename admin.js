@@ -1,7 +1,7 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 
-const { connection, isLoggedIn } = require("./utils");
+
+const { connection, bcrypt, isLoggedIn } = require("./utils");
 
 const saltRounds = 10;
 
