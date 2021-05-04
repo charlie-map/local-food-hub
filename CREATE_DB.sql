@@ -21,6 +21,7 @@ CREATE TABLE status (
 	status VARCHAR(255) NOT NULL DEFAULT 'unknown',
 	file_type VARCHAR(255) NOT NULL DEFAULT 'form',
 	frequency VARCHAR(255) NOT NULL DEFAULT 'daily',
+	ignore_notifier TINYINT NOT NULL DEFAULT 0,
 	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );
 

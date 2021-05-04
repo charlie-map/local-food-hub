@@ -49,11 +49,12 @@ app.post("/login", function(req, res) {
         }
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
             if (true) {
+                console.log("run values");
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
                 let token = uuid();
                 //we need to remove the old tokens first--if they exist 
-                connection.query('DELETE FROM uuid WHERE farmer_id = ?', [row[0].farmer_id], (err) => {
+                connection.query('DELETE FROM uuid WHERE farmer_id=?', [row[0].farmer_id], (err) => {
                     connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].farmer_id, now], (err) => {
                         if (err){
                             console.log(err);
