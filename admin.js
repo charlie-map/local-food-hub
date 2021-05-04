@@ -24,7 +24,8 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
 	});
 });
 
-router.post("/view-farms", isLoggedIn, (req, res) => {
+router.get("/view-farms", isLoggedIn, (req, res) => {
+	console.log("Hi")
 	connection.query("SELECT * FROM farmers", function(err, farmers){
 		if (err) console.log(err);
 		let row = [];

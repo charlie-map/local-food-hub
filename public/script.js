@@ -1,8 +1,11 @@
-var text = '[{"File Name":"John", "File ID":"john@gmail.com"},{"File Name":"Mary", "File ID":"mary@gmail.com"}]'
-var obj = {people: JSON.parse(text)};
+// var text = '[{allStati}]'
+// var obj = JSON.parse(text);
 
-$(document).ready(function() {
-    var template = $('#user-template').html();
-    var info = Mustache.render(template, obj);
-    $('#ModuleUserTable').append(info);
-});
+// $(document).ready(function() {
+//         var template = $('#user-template').html();
+//         for(var i in obj)
+//         {
+//         var info = Mustache.render(template, obj[i]);
+//         $('#ModuleUserTable').html(info);
+//         }
+// }); 
