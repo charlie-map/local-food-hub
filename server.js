@@ -48,7 +48,7 @@ app.post("/login", function(req, res) {
             return;
         }
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
-            if (true) {
+            if (result) {
                 console.log("run values");
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
