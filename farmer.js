@@ -34,7 +34,7 @@ function find_type(frequencies, stat_value) {
 	return frequencies[lowest_pos];
 }
 
-farmer.get("/view-status", /*isLoggedIn,*/ (req, res) => {
+farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", "test", function(err, farmer) {
 		if (err) console.error(err);
 		console.log(farmer);
@@ -72,7 +72,7 @@ farmer.get("/update", async (req, res) => {
 			return new Promise(async function(resolve, reject) {
 
 				try {
-					let status = await create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w');
+					let status = await create_main_log_object(item.root_folder);
 					let stat = status.map(function(folder) {
 						return new Promise(function(end, stop) {
 							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {

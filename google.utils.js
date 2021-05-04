@@ -40,6 +40,10 @@ const {
 	connection,
 	frequency_ofSubmission
 } = require("./utils.js");
+const {
+	seasons,
+	season
+} = require("./season.js");
 
 // Pull date libraries:
 const Sugar = require('sugar');
@@ -64,7 +68,6 @@ function find_id(all_files, file_name, submission_frequency) {
 		curr_distance = edit_dist(file.name.trim(), file_name);
 		first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
 
-		// console.log(curr_distance < lowest_fuzzy, first_letter_dist < 3, file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form");
 		if (curr_distance < lowest_fuzzy && first_letter_dist < 3 && file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form") {
 			lowest_fuzzy = curr_distance;
 			file_id = file.id;
@@ -161,7 +164,6 @@ async function create_main_log_object(folder_id) {
 		});
 	});
 	await Promise.all(pull_logs);
-	console.log(main_logs);
 
 	let doc = new GoogleSpreadsheet(mainlog_sheet_id);
 	await doc.useServiceAccountAuth({
@@ -199,7 +201,18 @@ async function create_main_log_object(folder_id) {
 	monthly_value = new Date(monthly_value.getFullYear(), monthly_value.getMonth(), Math.round((monthly_value.getDate() + 1) % 7), daily_value[0]);
 
 	all_dates.monthly = monthly_value;
-	all_dates.seasonal = spacetime.now().quarter();
+
+	let season_date = new Date();
+	all_dates.seasonal = season(season_date, seasons);
+	// // find what date season lines up
+	let temp_season = all_dates.seasonal;
+	while (all_dates.seasonal == temp_season) {
+		// create a new date moved back\
+		season_date = new Date(season_date.getFullYear(), season_date.getMonth(), season_date.getDate() - 1);
+		all_dates.seasonal = season(season_date, seasons);
+	}
+	all_dates.seasonal = new Date(season_date.getFullYear(), season_date.getMonth(), season_date.getDate() + 1);
+
 	for (let days = 1; days < 8; days++) { // find first monday of year
 		all_dates.annual = new Date(new Date().getFullYear(), 0, days, daily_value[0]);
 		if (all_dates.annual.getDay() == 1)
@@ -232,7 +245,6 @@ async function create_main_log_object(folder_id) {
 	// 5. annual = 4 ---- first monday of new year at 6am
 	// 6. preharvest = 5 ---- august 10th
 	// 7. deliverydays = 6 ---- friday and monday at 6am
-
 	let all_sheet_logs = [];
 	let count = 0;
 	let row_awaiting = full_row_data.map((log_row, index) => {
@@ -275,7 +287,6 @@ async function create_main_log_object(folder_id) {
 					if (return_file[1] == "form")
 						for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
 							main_logs
-							// console.log("\n\n\nTEST", log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, ""));
 							if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
 								spreadsheet_index_index = run;
 								break;

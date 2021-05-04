@@ -20,6 +20,7 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
 });
 
 router.post("/view-farms", isLoggedIn, (req, res) => {
+	console.log("test");
 	connection.query("SELECT * FROM farmers", function(err, farmers){
 		if (err) console.log(err);
 		let row = [];

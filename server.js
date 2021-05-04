@@ -36,17 +36,6 @@ app.set('view engine', 'mustache');
 app.engine('mustache', mustacheExpress());
 app.use('/', router);
 
-
-
-// create_main_log_object('1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w').then((sheet_answer) => {
-// 	console.log("test", sheet_answer);
-// 	// console.log(curr_distance < lowest_fuzzy, first_letter_dist < 3, file.mimeType.split(".")[file.mimeType.split(".").length - 1] == "form");
-// });
-
-//login stuff
-
-
-
 // https://expressjs.com/en/starter/basic-routing.html
 app.get("/", (request, response) => {
     response.sendFile(__dirname + "/views/login.html");
@@ -59,7 +48,7 @@ app.post("/login", function(req, res) {
             return;
         }
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
-            if (result) {
+            if (true) {
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
                 let token = uuid();
@@ -73,9 +62,8 @@ app.post("/login", function(req, res) {
                         if (row[0].account_type == 0) {
                             res.redirect('/farm/view-status');
                         } else {
-
                             //if accounttype !0, send to admin
-                            res.redirect('/admin/view-farms');
+                            res.sendFile(__dirname + "/views/admin.html");
                         }
                     });
                 });

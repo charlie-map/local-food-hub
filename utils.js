@@ -68,7 +68,6 @@ function isLoggedIn(req, res, next) {
     }
     connection.query('SELECT * FROM uuid LEFT JOIN farmers ON uuid.farmer_id = id WHERE token = ?;', [req.cookies.token], (err, row) => {
         if (err || row.length == 0) {
-        	console.log("shit");
             res.redirect('/')
             return;
         }
