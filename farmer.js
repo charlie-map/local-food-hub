@@ -65,9 +65,6 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 						STATUS: true
 					});
 			});
-			type.forEach((item) => {
-				console.log(item);
-			});
 			res.render("index", {
 				farm_name: farmer[0].farm_name,
 				type,

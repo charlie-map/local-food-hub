@@ -135,7 +135,6 @@ async function create_main_log_object(folder_id) {
 		ROOT_FOLDER: folder_id
 	});
 
-	console.log(folder_id);
 	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
 
 	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
@@ -285,7 +284,7 @@ async function create_main_log_object(folder_id) {
 							if (status) await new Promise((resolve) => {
 								connection.query("UPDATE status SET ignore_notifier=0 WHERE file_id=?", return_file[0], err => {
 									if (err) console.error(err);
-									resolve();
+									return connection_promise();
 								});
 							});
 							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
@@ -314,25 +313,24 @@ async function create_main_log_object(folder_id) {
 									status = true;
 								}
 							}
+
+							all_sheet_logs[index] = {
+								file_name: log_row._rawData[0],
+								file_id: return_file[0],
+								status: status,
+								file_type: return_file[1],
+								frequency_ofSubmission: log_row._rawData[2]
+							};
+							return connection_promise();
 						});
 					});
-				} else {
-					status = false;
-				}
 
-				all_sheet_logs[index] = {
-					file_name: log_row._rawData[0],
-					file_id: return_file[0],
-					status: status,
-					file_type: return_file[1],
-					frequency_ofSubmission: log_row._rawData[2]
-				};
+				} // otherwise do nothing
 			}
 			resolve();
 		});
 	});
 	await Promise.all(row_awaiting);
-	console.log("finished", all_sheet_logs);
 	return all_sheet_logs;
 }
 
