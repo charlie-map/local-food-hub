@@ -226,18 +226,7 @@ async function create_main_log_object(folder_id) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	}
 	all_dates.preharvest = preharvest_date;
-	all_dates.deliverydays = full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and");
-
-	// get dates of each of these objects using sugarjs
-
-	let temp_sugar;
-	if (Array.isArray(all_dates.deliverydays)) {
-		Object.values(all_dates).forEach((each_day, indeces) => {
-			temp_sugar = Sugar.Date.create("last " + each_day);
-			all_dates.deliverydays[indeces] = Sugar.Date.isValid(temp_sugar) ? temp_sugar : new Date(moment().day(each_day));
-			all_dates.deliverydays[indeces] = new Date(all_dates.deliverydays[indeces].getFullYear(), all_dates.deliverydays[indeces].getMonth(), all_dates.deliverydays[indeces].getDate(), daily_value[0]);
-		});
-	}
+	all_dates.deliverydays = Sugar.Date.create("last" + full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")[0]);
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am
@@ -286,8 +275,6 @@ async function create_main_log_object(folder_id) {
 						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
 							if (ignore_count.length) { // still check if today's date matches up
-								console.log(Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)));
-								console.log("ignoring", log_row._rawData[2], Sugar.Date(), all_dates[ignore_count[0].frequency], Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]));
 								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency])) {
 									status = false;
 									return connection_promise();
@@ -296,8 +283,10 @@ async function create_main_log_object(folder_id) {
 								}
 							}
 							if (status) await new Promise((resolve) => {
+								console.log("here");
 								connection.query("UPDATE status SET ignore_notifier=1 WHERE file_id=?", return_file[0], err => {
 									if (err) console.error(err);
+									console.log("update");
 									resolve();
 								});
 							});
