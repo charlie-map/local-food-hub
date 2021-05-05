@@ -300,7 +300,7 @@ async function create_main_log_object(folder_id) {
 						correctiveaction: 7,
 						riskassesment: 8 */
 					let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
-					if (frequency_ofSubmission == 5 || frequency_ofSubmission == 6 || frequency_ofSubmission == 7 || frequency_ofSubmission == 8) {
+					if (frequency_numCheck == 5 || frequency_numCheck == 6 || frequency_numCheck == 7 || frequency_numCheck == 8) {
 						status = false;
 					} else {
 						if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
@@ -321,6 +321,8 @@ async function create_main_log_object(folder_id) {
 				} else {
 					status = true;
 				}
+				console.log(log_row._rawData[0], "AHHH", log_row._rawData[2], status);
+
 
 				all_sheet_logs[index] = {
 					file_name: log_row._rawData[0],

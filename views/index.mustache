@@ -29,7 +29,9 @@
 						</form>
 					{{/STATUS}}
 					{{^STATUS}}
-						<p>Form completed.</p>
+						<form>
+							<button formaction="{{FILE_ID}}">Completed</button>
+						</form>
 					{{/STATUS}}
 				{{/row}}</div>
 			</ul>
