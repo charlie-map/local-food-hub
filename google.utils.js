@@ -283,41 +283,46 @@ async function create_main_log_object(folder_id) {
 
 				// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
 				if (main_logs[use_spreadsheet] && return_file[0]) {
-					// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
-					let spreadsheet_index_index = -1;
-					if (return_file[1] == "form")
-						for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
-							main_logs
-							if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
-								spreadsheet_index_index = run;
-								break;
-							}
-						};
+					await new Promise((connection_promise) => {
+						connection.query("SELECT name FROM status WHERE file_id=? AND ignore_notifier=?", async (err, ignore_count) => {
+							if (err) console.error(err);
+							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
+							let spreadsheet_index_index = -1;
+							if (return_file[1] == "form")
+								for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
+									main_logs
+									if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
+										spreadsheet_index_index = run;
+										break;
+									}
+								};
 
-					// don't need to check if it's one of the following:
-					/* onincident: 5,
-						asneeded: 6,
-						correctiveaction: 7,
-						riskassesment: 8 */
-					let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
-					if (frequency_numCheck == 5 || frequency_numCheck == 6 || frequency_numCheck == 7 || frequency_numCheck == 8) {
-						status = false;
-					} else {
-						if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
-							status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
-						} else {
-							status = true;
-						}
-					}
-					// } else { // dealing with a spreadsheet
-					// 	let check_altDoc = new GoogleSpreadsheet(return_file[0]);
-					// 	await check_altDoc.useServiceAccountAuth({
-					// 		client_email: process.env.CLIENT_EMAIL,
-					// 		private_key: process.env.PRIVATE_KEY
-					// 	});
-					// 	await check_altDoc.loadInfo();
-					// 	status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2], index);
-					// }
+							// don't need to check if it's one of the following:
+							/* onincident: 5,
+								asneeded: 6,
+								correctiveaction: 7,
+								riskassesment: 8 */
+							let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
+							if (frequency_numCheck == 5 || frequency_numCheck == 6 || frequency_numCheck == 7 || frequency_numCheck == 8) {
+								status = false;
+							} else {
+								if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
+									status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+								} else {
+									status = true;
+								}
+							}
+							// } else { // dealing with a spreadsheet
+							// 	let check_altDoc = new GoogleSpreadsheet(return_file[0]);
+							// 	await check_altDoc.useServiceAccountAuth({
+							// 		client_email: process.env.CLIENT_EMAIL,
+							// 		private_key: process.env.PRIVATE_KEY
+							// 	});
+							// 	await check_altDoc.loadInfo();
+							// 	status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2], index);
+							// }
+						});
+					});
 				} else {
 					status = true;
 				}

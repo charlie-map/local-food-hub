@@ -22,18 +22,11 @@
 					<span id="file_name"> {{FILE_NAME}}</span>
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
-						<!-- <a id="fileID" href="/{{FILE_URL}}">Click here to fill out</a> -->
-						<form>
-							<button id="fill_out" formaction="{{FILE_URL}}">Fill out</button>
-						</form>
-						<form>
-							<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
-						</form>
+						<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
+						<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
 					{{/STATUS}}
 					{{^STATUS}}
-						<form>
-							<button formaction="{{FILE_URL}}">Completed</button>
-						</form>
+						<a href="{{FILE_URL}}"><button id="complete">Completed</button></a>
 					{{/STATUS}}
 				{{/row}}</div>
 			</ul>
