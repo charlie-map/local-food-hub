@@ -42,14 +42,12 @@ app.get("/", (request, response) => {
 });
 //could be some bugs with /login--I think the page isn't what we intended. I think "/" is what we've interpreted as /login
 app.post("/login", function(req, res) {
-    console.log(req.body);
     connection.query('SELECT * FROM farmers WHERE username=?', [req.body.username], (err, row) => {
         if (err || row.length == 0) {
             res.sendFile(__dirname + '/views/login.html');
             return;
         }
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
-            console.log(result, req.body.psw, row[0].password);
             if (result) {
                 console.log("run values");
                 let now = new Date();
