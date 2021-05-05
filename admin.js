@@ -38,9 +38,10 @@ router.get("/create-admin", (req, res) => {
 });
 
 router.get("/view-farms", isLoggedIn, (req, res) => {
-    connection.query("SELECT * FROM farmers", function(err, farmers) {
+    connection.query("SELECT * FROM farmers WHERE account_type=0", function(err, farmers) {
         if (err) console.log(err);
         let type = [];
+        type.push({farm_name: "Farm name", email: "Email", root_folder:"Main folder ID"})
         farmers.forEach(farm => {
             type.push({
                 farm_name: farm.farm_name,
@@ -48,7 +49,6 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
                 root_folder: farm.root_folder
             });
         });
-        console.log(type);
         res.render('farm', {
             type
         });
