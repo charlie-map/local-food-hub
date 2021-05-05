@@ -23,7 +23,9 @@ let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On
 ];
 
 function find_type(frequencies, stat_value) {
-	let lowest = 1000, lowest_pos = 0, dist;
+	let lowest = 1000,
+		lowest_pos = 0,
+		dist;
 	frequencies.forEach((type, index) => {
 		dist = edit_dist(type, stat_value);
 		if (dist < lowest) {
@@ -35,32 +37,41 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
-	console.log(req.query);
 	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
-			let type = []
+			let type = [],
+				need_turnin = [];
 			stati.forEach((stat) => {
 				type[frequency_ofSubmission[stat.frequency]] = !type[frequency_ofSubmission[stat.frequency]] ? {
-					titleoftype: find_type(frequencies_title, stat.frequency), row: []
+					titleoftype: find_type(frequencies_title, stat.frequency),
+					row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
-				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
+				type[frequency_ofSubmission[stat.frequency]].row.push({
+					USERNAME: req.query.username,
+					FILE_NAME: stat.file_name,
+					FILE_ID: stat.file_id,
+					FILE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
+					STATUS: stat.status == "true" && stat.ignore_notifier == 0 ? true : false
+				});
+				if (stat.status == "true" && stat.ignore_notifier == 0)
+					need_turnin.push({
 						USERNAME: req.query.username,
 						FILE_NAME: stat.file_name,
-						FILE_ID: stat.file_id,
+						FILE_ID: stat.file_name,
 						FILE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
-						STATUS: stat.status == "true" && stat.ignore_notifier == 0 ? true : false
-					}
-				});
+						STATUS: true
+					});
 			});
 			type.forEach((item) => {
 				console.log(item);
 			});
 			res.render("index", {
 				farm_name: farmer[0].farm_name,
-				type
+				type,
+				need_turnin
 			});
 		});
 	});
@@ -84,7 +95,6 @@ farmer.get("/update", async (req, res) => {
 
 				try {
 					let status = await create_main_log_object(item.root_folder);
-					console.log(status);
 					let stat = status.map(function(folder) {
 						return new Promise(function(end, stop) {
 							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {

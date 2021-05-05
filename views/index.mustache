@@ -15,6 +15,13 @@
 	</header>
 	<main>
 
+		<h2>Current Forms</h2>
+		<div id = 'statusoftype'>{{#need_turnin}}
+			<span id="file_name"> {{FILE_NAME}}</span>
+			<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
+			<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
+		{{/need_turnin}}</div>
+
 		<div id = 'allStati'>{{#type}}{{#.}}
 			<ul id="list">
 				<span id = "title">{{titleoftype}}</span>

@@ -283,12 +283,24 @@ async function create_main_log_object(folder_id) {
 				// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
 				if (main_logs[use_spreadsheet] && return_file[0]) {
 					await new Promise((connection_promise) => {
-						connection.query("SELECT farmer_id FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
+						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
-							if (ignore_count.length) {
-								status = false;
-								return connection_promise();
+							if (ignore_count.length) { // still check if today's date matches up
+								console.log(Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)));
+								console.log("ignoring", log_row._rawData[2], Sugar.Date(), all_dates[ignore_count[0].frequency], Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]));
+								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency])) {
+									status = false;
+									return connection_promise();
+								} else {
+									status = true;
+								}
 							}
+							if (status) await new Promise((resolve) => {
+								connection.query("UPDATE status SET ignore_notifier=1 WHERE file_id=?", return_file[0], err => {
+									if (err) console.error(err);
+									resolve();
+								});
+							});
 							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 							let spreadsheet_index_index = -1;
 							if (return_file[1] == "form")
@@ -315,22 +327,12 @@ async function create_main_log_object(folder_id) {
 									status = true;
 								}
 							}
-							// } else { // dealing with a spreadsheet
-							// 	let check_altDoc = new GoogleSpreadsheet(return_file[0]);
-							// 	await check_altDoc.useServiceAccountAuth({
-							// 		client_email: process.env.CLIENT_EMAIL,
-							// 		private_key: process.env.PRIVATE_KEY
-							// 	});
-							// 	await check_altDoc.loadInfo();
-							// 	status = await check_status(check_altDoc.sheetsByIndex[0], all_dates, log_row._rawData[2], index);
-							// }
 						});
 					});
 				} else {
-					status = true;
+					status = false;
 				}
 
-				console.log("finish");
 				all_sheet_logs[index] = {
 					file_name: log_row._rawData[0],
 					file_id: return_file[0],
