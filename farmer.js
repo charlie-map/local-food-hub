@@ -47,7 +47,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
 						FILE_NAME: stat.file_name,
-						FILE_ID: "docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
+						FILE_ID: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
 						STATUS: stat.status == "true" ? true : false
 					}
 				});
