@@ -2,19 +2,18 @@
 <!-- served from your routes in server.js -->
 <!DOCTYPE html>
 <html lang="en">
-<!-- import the webpage's stylesheet -->
-<link rel="stylesheet" href="/style.css" />
+<head>
+	<!-- import the webpage's stylesheet -->
+	<link rel="stylesheet" href="/style.css" />
 
-<!-- import the webpage's client-side javascript file -->
+	<!-- import the webpage's client-side javascript file -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 	<header>
 		<h1>Homepage for {{farm_name}}</h1>
 	</header>
 	<main>
-		<form action="/login" method="get">
-			<button class="view-button">View Farms</button>
-		</form>
 
 		<div id = 'allStati'>{{#type}}{{#.}}
 			<ul id="list">
@@ -23,33 +22,23 @@
 					<span id="file_name"> {{FILE_NAME}}</span>
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
-						<!-- <a id="fileID" href="/{{FILE_ID}}">Click here to fill out</a> -->
+						<!-- <a id="fileID" href="/{{FILE_URL}}">Click here to fill out</a> -->
 						<form>
-							<button formaction="{{FILE_ID}}">Fill out</button>
+							<button id="fill_out" formaction="{{FILE_URL}}">Fill out</button>
+						</form>
+						<form>
+							<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
 						</form>
 					{{/STATUS}}
 					{{^STATUS}}
 						<form>
-							<button formaction="{{FILE_ID}}">Completed</button>
+							<button formaction="{{FILE_URL}}">Completed</button>
 						</form>
 					{{/STATUS}}
 				{{/row}}</div>
 			</ul>
 		{{/.}}{{/type}}</div>
-
-<!-- 		<table border="1">
-			<tr>
-				<th>File Name</th>
-				<th>Status</th>
-			</tr>
-			<tr id = "ModuleUserTable"> 
-			</tr> 
-		</table>
-		<script id="user-template" type="text/template">
-			<td>{{FILE_NAME}}</td>
-			<td>{{STATUS}}</td>
-		</script> -->
-		
 	</main>
+	<script src="/script.js"></script>
 </body>
 </html>

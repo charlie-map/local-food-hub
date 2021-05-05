@@ -35,6 +35,7 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
+	console.log(req.query);
 	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
 		// go into the status table and grab values from there
@@ -46,9 +47,11 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					titleoftype: find_type(frequencies_title, stat.frequency), row: []
 				} : type[frequency_ofSubmission[stat.frequency]];
 				type[frequency_ofSubmission[stat.frequency]].row.push({ ...{
+						USERNAME: req.query.username,
 						FILE_NAME: stat.file_name,
-						FILE_ID: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
-						STATUS: stat.status == "true" ? true : false
+						FILE_ID: stat.file_id,
+						FILE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
+						STATUS: stat.status == "true" && stat.ignore_notifier == 0 ? true : false
 					}
 				});
 			});
@@ -63,14 +66,12 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 	});
 });
 
-farmer.get("/ignore", isLoggedIn, (req, res) => {
-	console.log(req.query);
-	connection.query("SELECT id FROM farmers WHERE farm_name=?", req.query.username, (err, farm_id) => {
+farmer.get("/check-off/:username/:file_id", isLoggedIn, (req, res) => {
+	connection.query("SELECT id FROM farmers WHERE username=?", req.params.username, (err, farm_id) => {
 		if (err) console.error(err);
-		let params = req.query.url.split("/");
-		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, params[1].substring(0, params[1].length)], (err) => {
+		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, req.params.file_id], (err) => {
 			if (err) console.error(err);
-			res.end();
+			res.redirect("/farm/view-status?username=" + req.params.username);
 		});
 	});
 });

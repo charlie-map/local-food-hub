@@ -40,17 +40,17 @@ router.get("/create-admin", (req, res) => {
 router.post("/view-farms", isLoggedIn, (req, res) => {
     connection.query("SELECT * FROM farmers", function(err, farmers) {
         if (err) console.log(err);
-        let row = [];
+        let type = [];
         farmers.forEach(farm => {
-            row.push({
+            type.push({
                 farm_name: farm.farm_name,
                 email: farm.email,
                 root_folder: farm.root_folder
             });
         });
-        console.log(row);
-        res.render('farms', {
-            row
+        console.log(type);
+        res.render('farm', {
+            type
         });
     });
 });

@@ -321,8 +321,6 @@ async function create_main_log_object(folder_id) {
 				} else {
 					status = true;
 				}
-				console.log(log_row._rawData[0], "AHHH", log_row._rawData[2], status);
-
 
 				all_sheet_logs[index] = {
 					file_name: log_row._rawData[0],
