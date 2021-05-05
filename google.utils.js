@@ -275,7 +275,7 @@ async function create_main_log_object(folder_id) {
 						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
 							if (ignore_count.length) { // still check if today's date matches up
-								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency])) {
+								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw) {
 									status = false;
 									return connection_promise();
 								} else {
@@ -283,10 +283,8 @@ async function create_main_log_object(folder_id) {
 								}
 							}
 							if (status) await new Promise((resolve) => {
-								console.log("here");
-								connection.query("UPDATE status SET ignore_notifier=1 WHERE file_id=?", return_file[0], err => {
+								connection.query("UPDATE status SET ignore_notifier=0 WHERE file_id=?", return_file[0], err => {
 									if (err) console.error(err);
-									console.log("update");
 									resolve();
 								});
 							});
