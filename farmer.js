@@ -52,9 +52,9 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					}
 				});
 			});
-			// type.forEach((item) => {
-			// 	console.log(item);
-			// });
+			type.forEach((item) => {
+				console.log(item);
+			});
 			res.render("index", {
 				farm_name: farmer[0].farm_name,
 				type
@@ -63,11 +63,8 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 	});
 });
 
-farmer.get("/fill-out/:url", isLoggedIn, (req, res) => {
-
-});
-
 farmer.get("/ignore", isLoggedIn, (req, res) => {
+	console.log(req.query);
 	connection.query("SELECT id FROM farmers WHERE farm_name=?", req.query.username, (err, farm_id) => {
 		if (err) console.error(err);
 		let params = req.query.url.split("/");
