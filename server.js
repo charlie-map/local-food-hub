@@ -103,6 +103,6 @@ app.get("/logout", isLoggedIn, (req, res) => {
 //     res.end("hello" + " " + req.username);
 //     //res.redirect('/homebase');
 // });
-app.listen(8080, () => {
+app.listen(6969, () => {
     console.log("server go vroom");
 });

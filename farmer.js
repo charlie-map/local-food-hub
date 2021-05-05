@@ -84,6 +84,7 @@ farmer.get("/update", async (req, res) => {
 
 				try {
 					let status = await create_main_log_object(item.root_folder);
+					console.log(status);
 					let stat = status.map(function(folder) {
 						return new Promise(function(end, stop) {
 							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {

@@ -280,12 +280,15 @@ async function create_main_log_object(folder_id) {
 						use_spreadsheet = log_index;
 					}
 				});
-
 				// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
 				if (main_logs[use_spreadsheet] && return_file[0]) {
 					await new Promise((connection_promise) => {
-						connection.query("SELECT name FROM status WHERE file_id=? AND ignore_notifier=?", async (err, ignore_count) => {
+						connection.query("SELECT farmer_id FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
+							if (ignore_count.length) {
+								status = false;
+								return connection_promise();
+							}
 							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 							let spreadsheet_index_index = -1;
 							if (return_file[1] == "form")
@@ -327,6 +330,7 @@ async function create_main_log_object(folder_id) {
 					status = true;
 				}
 
+				console.log("finish");
 				all_sheet_logs[index] = {
 					file_name: log_row._rawData[0],
 					file_id: return_file[0],
@@ -339,6 +343,7 @@ async function create_main_log_object(folder_id) {
 		});
 	});
 	await Promise.all(row_awaiting);
+	console.log("finished", all_sheet_logs);
 	return all_sheet_logs;
 }
 
