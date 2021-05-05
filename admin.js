@@ -37,7 +37,7 @@ router.get("/create-admin", (req, res) => {
     });
 });
 
-router.post("/view-farms", isLoggedIn, (req, res) => {
+router.get("/view-farms", isLoggedIn, (req, res) => {
     connection.query("SELECT * FROM farmers", function(err, farmers) {
         if (err) console.log(err);
         let row = [];
@@ -49,7 +49,7 @@ router.post("/view-farms", isLoggedIn, (req, res) => {
             });
         });
         console.log(row);
-        res.render('farms', {
+        res.render('farm', {
             row
         });
     });
