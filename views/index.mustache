@@ -20,7 +20,9 @@
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
 						<!-- <a id="fileID" href="/{{FILE_ID}}">Click here to fill out</a> -->
-						<a href="/farm/fill-out/{{FILE_ID}}">Click here to fill out</a>
+						<form>
+							<button formaction="{{FILE_ID}}">Fill out</button>
+						</form>
 					{{/STATUS}}
 					{{^STATUS}}
 						<p>Form completed.</p>
