@@ -49,7 +49,7 @@ h2{
     bottom: 23px;
     right: 28px;
     width: 280px;
-    position: fixed;
+    //position: fixed;
   }
 
   /* The popup form - hidden by default */
