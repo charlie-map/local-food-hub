@@ -30,7 +30,6 @@ router.get("/create-admin", (req, res) => {
 	let admin = {farm_name: "admin", username: "admin", email: "admin@gmail.com", password: "test", root_folder: "adminfolder", account_type: 1}
     bcrypt.hash(admin.password, saltRounds, function(err, hash) {
         admin.password = hash;
-        console.log(hash);
         connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder, account_type) VALUES (?, ?, ?, ?, ?, ?)", Object.values(admin), function(err) {
             if (err) console.log(err);
         });

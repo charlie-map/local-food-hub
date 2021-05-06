@@ -52,11 +52,15 @@ const moment = require('moment');
 
 async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 	return new Promise(async (resolve, reject) => {
-		let fileList = await googleDriveInstance.list({
-			fileId: main_folder_id,
-			recursive: pull_recursive
-		})
-		resolve(fileList);
+		try {
+			let fileList = await googleDriveInstance.list({
+				fileId: main_folder_id,
+				recursive: pull_recursive
+			})
+			resolve(fileList);
+		} catch (error) {
+			reject(error);
+		}
 	});
 }
 
@@ -102,6 +106,7 @@ async function pull_main_logs(googleDriveInstance, main_folder_id) {
 
 		let return_sheets = [];
 		// find each folder name
+		if (!fileList.files) return resolve();
 		let promiseBound = fileList.files.map(async (item) => {
 			if (item.mimeType.split(".")[item.mimeType.split(".").length - 1] == "folder") {
 
@@ -130,19 +135,20 @@ async function pull_main_logs(googleDriveInstance, main_folder_id) {
 			with their names and times of fillling out (daily, weekly, on incident, etc.)
 */
 async function create_main_log_object(folder_id) {
-	const creds_service_user = require(PATH_TO_CREDENTIALS);
-	const googleDriveInstance = new NodeGoogleDrive({
-		ROOT_FOLDER: folder_id
-	});
-
+	let creds_service_user, googleDriveInstance, gdrive, root_files;
 	try {
-		let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+		creds_service_user = require(PATH_TO_CREDENTIALS);
+		googleDriveInstance = new NodeGoogleDrive({
+			ROOT_FOLDER: folder_id
+		});
+
+		gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+		root_files = await pull_files(googleDriveInstance, folder_id, false, false);
 	} catch (error) {
-		console.error(error);
+		console.log("oh no!", error);
 		return;
 	}
 
-	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
 	let mainlog_sheet_id = "";
 	root_files.files.forEach((item) => {
 		if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
@@ -154,18 +160,22 @@ async function create_main_log_object(folder_id) {
 	// go through main logs and create a connnection to each spreadsheet
 	let pull_logs = main_logs.map(async (log, index) => {
 		return new Promise(async (resolve, reject) => {
-			let pull_log_doc = new GoogleSpreadsheet(log.id);
-			await pull_log_doc.useServiceAccountAuth({
-				client_email: process.env.CLIENT_EMAIL,
-				private_key: process.env.PRIVATE_KEY
-			})
-			await pull_log_doc.loadInfo();
-			main_logs[index] = {
-				name: log.name,
-				parent_id: log.parents[log.parents.length - 1],
-				doc: pull_log_doc
+			try {
+				let pull_log_doc = new GoogleSpreadsheet(log.id);
+				await pull_log_doc.useServiceAccountAuth({
+					client_email: process.env.CLIENT_EMAIL,
+					private_key: process.env.PRIVATE_KEY
+				})
+				await pull_log_doc.loadInfo();
+				main_logs[index] = {
+					name: log.name,
+					parent_id: log.parents[log.parents.length - 1],
+					doc: pull_log_doc
+				}
+				resolve();
+			} catch (error) {
+				reject(error);
 			}
-			resolve();
 		});
 	});
 	await Promise.all(pull_logs);
