@@ -9,31 +9,30 @@
 </head>
 <body>
 
-	<div id = 'allStati'>{{#type}}{{#.}}
-		<table id = "Tableoffarms">
+	<form method="get" action="/admin">
+		<button class="return-button">Return</button>
+	</form>
+
+	<table>
+		<tr>
+			<th>Farm Name</th>
+			<th>Email</th>
+			<th>Folder ID</th>
+		</tr>
+		<div id = 'allStati'>{{#type}}{{#.}}
 			<tr>
-				<th>
-					
-				</th>
-				<td>
-					<span id=#farm-name>{{farm_name}}</span>
-				</td>
-				<td>
-					<span id=#email>{{email}}</span>
-				</td>
-				<td>
-					<span id=#root-folder>{{root_folder}}</span>
-				</td>
+				<td><span id=#farm-name>{{farm_name}}</span></td>
+				<td><span id=#email>{{email}}</span></td>
+				<td><span id=#root-folder>{{root_folder}}</span></td>
 				<td>
 					<form method="get" action="/delete-farm/{{email}}">
-						<button class="delete-button">x</button>
-					</form>			
+						<button class="delete-button"><i class="fas fa-trash"></i></button>
+					</form>
 				</td>
 			</tr>
-		</table>
-	{{/.}}{{/type}}</div>
-
+		{{/.}}{{/type}}</div>
+	</table>
 </main>
-</script>
+<script src="https://kit.fontawesome.com/3787aa0e64.js" crossorigin="anonymous"></script>
 </body>
 </html>

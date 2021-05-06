@@ -46,10 +46,10 @@ h2{
     font-size: 20px;
     border: 2px solid #7d0849;  
     cursor: pointer
+    width: 280px;
+    position: fixed;
     bottom: 23px;
     right: 28px;
-    width: 280px;
-    //position: fixed;
   }
 
   /* The popup form - hidden by default */
