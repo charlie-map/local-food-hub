@@ -11,6 +11,12 @@ $("#reset_password_popup").hide();
 //         }
 // }); 
 
+// $(document).ready(function(){
+// 	$("#Farms").on('click','.btnDelete',function(){
+// 		$(this).closest('tr').remove();
+// 	});
+// });
+
 //NOTES ABOUT THIS:
 /*  you must use function (event), no fat arrows
 	this.id should work fine, if not - $(this).attr("id") OR $(this).prop("id")

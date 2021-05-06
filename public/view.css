@@ -38,7 +38,7 @@ table {
   border-collapse:separate;
   border-radius:10px;
   -moz-border-radius:6px;
-  background-color: #F5F5F5;
+  background-color: black;
 }
 
 #status th {

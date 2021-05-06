@@ -10,8 +10,11 @@
 <body>
 
 	<div id = 'allStati'>{{#type}}{{#.}}
-		<table>
+		<table id = "Tableoffarms">
 			<tr>
+				<th>
+					
+				</th>
 				<td>
 					<span id=#farm-name>{{farm_name}}</span>
 				</td>
@@ -21,10 +24,16 @@
 				<td>
 					<span id=#root-folder>{{root_folder}}</span>
 				</td>
+				<td>
+					<form method="get" action="/delete-farm/{{email}}">
+						<button class="delete-button">x</button>
+					</form>			
+				</td>
 			</tr>
 		</table>
 	{{/.}}{{/type}}</div>
 
 </main>
+</script>
 </body>
 </html>
