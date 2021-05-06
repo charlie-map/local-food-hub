@@ -139,5 +139,16 @@ footer {
 
 #statusoftype {
   display: grid;
-  grid-template-columns: 50% 50%;
+}
+
+#reset_password {
+  position: absolute;
+  top: 15%;
+  right: 5%;
+}
+
+#reset_password_form {
+  position: absolute;
+  width: calc(100vw - 69px);
+  right: calc(10vw + 110px);
 }

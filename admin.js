@@ -8,7 +8,7 @@ const {
 
 const saltRounds = 10;
 
-const router = express.Router()
+const router = express.Router();
 
 router.get("/admin", isLoggedIn, (req, res) => {
 	res.sendFile(__dirname + "/views/admin.html");
@@ -41,7 +41,6 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
     connection.query("SELECT * FROM farmers WHERE account_type=0", function(err, farmers) {
         if (err) console.log(err);
         let type = [];
-        type.push({farm_name: "Farm name", email: "Email", root_folder:"Main folder ID"})
         farmers.forEach(farm => {
             type.push({
                 farm_name: farm.farm_name,
@@ -55,10 +54,10 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
     });
 });
 
-router.get("/delete-farm", isLoggedIn, (req, res) => {
-    connection.query("DELETE FROM farmers WHERE email=?", req.body.email, function(err, farmers) {
+router.get("/delete-farm/:email", isLoggedIn, (req, res) => {
+    connection.query("DELETE FROM farmers WHERE email=?", req.params.email, function(err, farmers) {
         if (err) console.log(err);
-        res.end();
+        res.redirect("/admin");
     });
 });
 

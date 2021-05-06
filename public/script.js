@@ -1,3 +1,4 @@
+$("#reset_password_popup").hide();
 // var text = '[{allStati}]'
 // var obj = JSON.parse(text);
 
@@ -25,4 +26,12 @@ $(".ignore_file").click(function(event) {
 			window.location.reload()
 		}
 	});
+});
+
+$("#reset_password").click(() => {
+	$("#reset_password_popup").toggle();
+});
+
+$("#close_popup").click(() => {
+	$("#reset_password_popup").toggle();
 });
