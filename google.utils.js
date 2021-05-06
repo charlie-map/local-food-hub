@@ -135,7 +135,12 @@ async function create_main_log_object(folder_id) {
 		ROOT_FOLDER: folder_id
 	});
 
-	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+	try {
+		let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
+	} catch (error) {
+		console.error(error);
+		return;
+	}
 
 	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
 	let mainlog_sheet_id = "";
@@ -225,7 +230,22 @@ async function create_main_log_object(folder_id) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	}
 	all_dates.preharvest = preharvest_date;
-	all_dates.deliverydays = Sugar.Date.create("last" + full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and")[0]);
+	all_dates.deliverydays = full_row_data[frequency_position + 7]._rawData[full_row_data[frequency_position + 7]._rawData.length - 1].replace(/[ ]/g, "").split("and");
+
+	// find which delivery day is the most recent (past)
+	let recent = 0,
+		recent_date = new Date(),
+		curr_date;
+	all_dates.deliverydays.forEach((day, index) => {
+		curr_date = Sugar.Date.create(day);
+		curr_date = Sugar.Date(curr_date).isFuture().raw ? new Date(curr_date.getFullYear(), curr_date.getMonth(), curr_date.getDate() - 7) : curr_date;
+		if (Sugar.Date(recent_date).isAfter(curr_date) && (Sugar.Date(curr_date).isAfter(all_dates.deliverydays[recent]) || index == 0)) {
+			recent = index;
+			recent_date = curr_date;
+		};
+	});
+
+	all_dates.deliverydays = recent_date;
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am

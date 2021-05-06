@@ -164,6 +164,7 @@ footer {
 
 #reset_password_form {
   position: absolute;
-  width: calc(100vw - 69px);
-  right: calc(10vw + 110px);
+  width: calc(100vw - 60px);
+  top: calc(2vw - 180px);
+  right: calc(10vw - 400px);
 }
