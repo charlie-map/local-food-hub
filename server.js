@@ -49,7 +49,6 @@ app.post("/login", function(req, res) {
         }
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
             if (result) {
-                console.log("run values");
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
                 let token = uuid();
@@ -60,9 +59,7 @@ app.post("/login", function(req, res) {
                             console.log(err);
                         }
                         res.cookie("token", token);
-                        console.log(row[0].account_type);
                         if (row[0].account_type == 0) {
-                            console.log("ah");
                             res.redirect('/farm/view-status?username=' + req.body.username);
                         } else {
                             //if accounttype !0, send to admin

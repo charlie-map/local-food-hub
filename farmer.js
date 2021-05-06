@@ -67,7 +67,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					});
 			});
 			res.render("index", {
-				farm_name: farmer[0].farm_name,
+				farm_name: farmer[0].farm_name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
 				type,
 				need_turnin
 			});
