@@ -135,7 +135,6 @@ async function create_main_log_object(folder_id) {
 		ROOT_FOLDER: folder_id
 	});
 
-	console.log(folder_id);
 	let gdrive = await googleDriveInstance.useServiceAccountAuth(creds_service_user);
 
 	let root_files = await pull_files(googleDriveInstance, folder_id, false, false);
@@ -275,7 +274,7 @@ async function create_main_log_object(folder_id) {
 						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
 							if (ignore_count.length) { // still check if today's date matches up
-								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency])) {
+								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw) {
 									status = false;
 									return connection_promise();
 								} else {
@@ -283,11 +282,9 @@ async function create_main_log_object(folder_id) {
 								}
 							}
 							if (status) await new Promise((resolve) => {
-								console.log("here");
-								connection.query("UPDATE status SET ignore_notifier=1 WHERE file_id=?", return_file[0], err => {
+								connection.query("UPDATE status SET ignore_notifier=0 WHERE file_id=?", return_file[0], err => {
 									if (err) console.error(err);
-									console.log("update");
-									resolve();
+									return connection_promise();
 								});
 							});
 							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
@@ -316,25 +313,24 @@ async function create_main_log_object(folder_id) {
 									status = true;
 								}
 							}
+
+							all_sheet_logs[index] = {
+								file_name: log_row._rawData[0],
+								file_id: return_file[0],
+								status: status,
+								file_type: return_file[1],
+								frequency_ofSubmission: log_row._rawData[2]
+							};
+							return connection_promise();
 						});
 					});
-				} else {
-					status = false;
-				}
 
-				all_sheet_logs[index] = {
-					file_name: log_row._rawData[0],
-					file_id: return_file[0],
-					status: status,
-					file_type: return_file[1],
-					frequency_ofSubmission: log_row._rawData[2]
-				};
+				} // otherwise do nothing
 			}
 			resolve();
 		});
 	});
 	await Promise.all(row_awaiting);
-	console.log("finished", all_sheet_logs);
 	return all_sheet_logs;
 }
 

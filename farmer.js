@@ -39,6 +39,8 @@ function find_type(frequencies, stat_value) {
 farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
+		console.log(farmer);
+		if (!farmer.length) return res.redirect("/");
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
@@ -65,9 +67,6 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 						STATUS: true
 					});
 			});
-			type.forEach((item) => {
-				console.log(item);
-			});
 			res.render("index", {
 				farm_name: farmer[0].farm_name,
 				type,
@@ -80,7 +79,19 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 farmer.get("/check-off/:username/:file_id", isLoggedIn, (req, res) => {
 	connection.query("SELECT id FROM farmers WHERE username=?", req.params.username, (err, farm_id) => {
 		if (err) console.error(err);
+		if (!farm_id.length) res.redirect("/");
 		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, req.params.file_id], (err) => {
+			if (err) console.error(err);
+			res.redirect("/farm/view-status?username=" + req.params.username);
+		});
+	});
+});
+
+farmer.post("/reset-password", isLoggedIn, (req, res) => {
+	console.log(req.body);
+	bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+		if (err) console.error(err);
+		connection.query("UPDATE farmers SET password=? WHERE username=?", [hash, req.body.username], (err) => {
 			if (err) console.error(err);
 			res.redirect("/farm/view-status?username=" + req.params.username);
 		});

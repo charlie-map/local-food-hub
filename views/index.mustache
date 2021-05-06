@@ -5,6 +5,8 @@
 <head>
 	<!-- import the webpage's stylesheet -->
 	<link rel="stylesheet" href="/style.css" />
+	<link rel="stylesheet" href="/login.css">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- import the webpage's client-side javascript file -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -22,7 +24,7 @@
 			<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
 		{{/need_turnin}}</div>
 
-		<div id = 'allStati'>{{#type}}{{#.}}
+		<div id='allStati'>{{#type}}{{#.}}
 			<ul id="list">
 				<span id = "title">{{titleoftype}}</span>
 				<div id = 'statusoftype'>{{#row}}
@@ -38,6 +40,21 @@
 				{{/row}}</div>
 			</ul>
 		{{/.}}{{/type}}</div>
+
+		<button id="reset_password">
+			Reset password
+		</button>
+
+		<div class="form-popup" id="reset_password_popup">
+			<form method="POST" id="reset_password_form" action="/farm/reset-password" class="form-container">
+        		<input type="text" placeholder="Enter username" name="username" required>
+
+       			<input type="password" placeholder="Enter new password" name="password" required>
+
+       			<button type="submit" class="btn">Submit</button>
+        		<button type="button" id="close_popup" class="btn cancel">Close</button>
+			</form>
+		</div>
 	</main>
 	<script src="/script.js"></script>
 </body>
