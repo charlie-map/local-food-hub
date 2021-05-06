@@ -39,8 +39,7 @@ function find_type(frequencies, stat_value) {
 farmer.get("/view-status", isLoggedIn, (req, res) => {
 	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
-		console.log(farmer);
-		if (!farmer.length) return res.redirect("/");
+		if (!farmer || !farmer.length) return res.redirect("/");
 		// go into the status table and grab values from there
 		connection.query("SELECT * FROM status WHERE farmer_id=?", farmer[0].id, (err, stati) => {
 			if (err) console.error(err);
@@ -88,12 +87,11 @@ farmer.get("/check-off/:username/:file_id", isLoggedIn, (req, res) => {
 });
 
 farmer.post("/reset-password", isLoggedIn, (req, res) => {
-	console.log(req.body);
 	bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
 		if (err) console.error(err);
 		connection.query("UPDATE farmers SET password=? WHERE username=?", [hash, req.body.username], (err) => {
 			if (err) console.error(err);
-			res.redirect("/farm/view-status?username=" + req.params.username);
+			res.redirect("/farm/view-status?username=" + req.body.username);
 		});
 	});
 });

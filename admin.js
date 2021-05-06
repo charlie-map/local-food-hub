@@ -57,7 +57,7 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
 router.get("/delete-farm/:email", isLoggedIn, (req, res) => {
     connection.query("DELETE FROM farmers WHERE email=?", req.params.email, function(err, farmers) {
         if (err) console.log(err);
-        res.redirect("/admin");
+        res.redirect("/view-farms");
     });
 });
 
