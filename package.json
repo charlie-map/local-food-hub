@@ -13,6 +13,6 @@
     "node-google-drive-new": "^1.1.4",
     "spacetime": "^6.16.0",
     "sugar": "^2.0.6",
-    "uuidv4": "^6.2.7"
+    "uuid": "^8.3.2"
   }
 }

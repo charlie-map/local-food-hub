@@ -66,8 +66,8 @@ function isLoggedIn(req, res, next) {
         res.redirect('/');
         return;
     }
-    connection.query('SELECT * FROM uuid LEFT JOIN farmers ON uuid.farmer_id = id WHERE token = ?;', [req.cookies.token], (err, row) => {
-        if (err || row.length == 0) {
+    connection.query('SELECT * FROM uuid LEFT JOIN farmers ON uuid.farmer_id=id WHERE token=?;', [req.cookies.token], (err, row) => {
+        if (err || row.length == 0 || !row[0].farmer_id) {
             res.redirect('/')
             return;
         }
@@ -80,7 +80,8 @@ function isLoggedIn(req, res, next) {
             let updateExpiry = new Date();
             updateExpiry.setSeconds(updateExpiry.getSeconds() + 3600);
             req.username = row[0].username;
-            connection.query('UPDATE uuid SET expiry = ? WHERE token = ?', [updateExpiry, req.cookies.token], (err) => {
+            connection.query('UPDATE uuid SET expiry=? WHERE token=?', [updateExpiry, req.cookies.token], (err) => {
+                if (err) console.log(err);
                 res.cookie("token", req.cookies.token, {
                     expires: new Date(updateExpiry)
                 });

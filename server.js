@@ -23,8 +23,8 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
 const {
-    uuid
-} = require("uuidv4");
+    v4: uuidv4
+} = require("uuid");
 
 
 app.use(express.static(__dirname + "/public"));
@@ -51,13 +51,12 @@ app.post("/login", function(req, res) {
             if (result) {
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
-                let token = uuid();
+                let token = uuidv4();
                 //we need to remove the old tokens first--if they exist 
-                connection.query('DELETE FROM uuid WHERE farmer_id=?', [row[0].farmer_id], (err) => {
-                    connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].farmer_id, now], (err) => {
-                        if (err){
-                            console.log(err);
-                        }
+                connection.query('DELETE FROM uuid WHERE farmer_id=?', [row[0].id], (err) => {
+                    if (err) console.log(err);
+                    connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].id, now], (err) => {
+                        if (err) console.log(err);
                         res.cookie("token", token);
                         if (row[0].account_type == 0) {
                             res.redirect('/farm/view-status?username=' + req.body.username);

@@ -149,6 +149,8 @@ async function create_main_log_object(folder_id) {
 		return;
 	}
 
+	console.log(folder_id);
+
 	let mainlog_sheet_id = "";
 	root_files.files.forEach((item) => {
 		if (edit_dist(item.name.substring(item.name.length - 12).toLowerCase().replace(/[^a-z]/g, ""), "logschedule") < 3)
