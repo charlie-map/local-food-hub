@@ -266,14 +266,24 @@ async function create_main_log_object(folder_id) {
 	// 5. annual = 4 ---- first monday of new year at 6am
 	// 6. preharvest = 5 ---- august 10th
 	// 7. deliverydays = 6 ---- friday and monday at 6am
-	let all_sheet_logs = [], data_keep = [];
-	let count = 0, ignore_notifier;
+	let all_sheet_logs = [],
+		data_keep = [];
+	let count = 0,
+		ignore_notifier;
 	let i;
 	let row_awaiting = full_row_data.map((log_row, index) => {
 		// first run through a separate data table and make sure we haven't seen this row before.
 		// This is to ensure that were won't get stuck with mutliple values connected to the same sheet (possibly for different frequencies)
-		let check_rowNum = log_row._rawData[0].split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
-		let name_ofRow = log_row._rawData[0].split(" ").splice(0, 1).join(" ").split(".")[0].toLowerCase();
+		if (!log_row._rawData[0] || !log_row._rawData[0].length || !log_row._rawData[2] || !log_row._rawData[2].length)
+			return;
+
+		let initial_string = log_row._rawData[0].split(" ");
+		let check_rowNum = initial_string[0].length < 4 ?
+			(initial_string[0] + initial_string[1]).toLowerCase().replace(/[^a-z0-9]/g, "") :
+			initial_string[0].toLowerCase().replace(/[^a-z0-9]/g, "");
+		let name_ofRow = initial_string[0].length < 4 ?
+			initial_string.splice(2).join(" ").split(".")[0].toLowerCase() :
+			initial_string.splice(1).join(" ").split(".")[0].toLowerCase();
 		for (i = 0; i < data_keep.length; i++) {
 			// check our current row against any other rows
 			// dist check on check_rowNum against data_keep[i][0] and name_ofRow against data_keep[i][1]
@@ -283,95 +293,92 @@ async function create_main_log_object(folder_id) {
 				// if this is true, than we've found a duplicate
 				break;
 		}
-		if (i != data_keep.length - 1)
+		if (data_keep.length && i != data_keep.length)
 			return; // we don't want this value
 
 		data_keep.push([check_rowNum, name_ofRow]);
 
 		return new Promise(async (resolve, reject) => {
-			// if (index < 7) {
 			// run through all the log data
 			// find the ones that have at least 3 items (meaning they have enough data to qualify)
-			if (log_row._rawData[0] && log_row._rawData[0].length && log_row._rawData[2] && log_row._rawData[2].length) {
-				log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
-				// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
-				let status = false; // if they still need to turn it in
-				let temporary_item;
-				let lowest_fuzzy = 10000;
-				Object.keys(frequency_ofSubmission).forEach((item) => {
-					// compare item and see which we will choose
-					let distance = edit_dist(log_row._rawData[2], item);
-					if (lowest_fuzzy > distance) {
-						temporary_item = item;
-						lowest_fuzzy = distance;
-					}
-				});
+			log_row._rawData[2] = log_row._rawData[2].toLowerCase().replace(/[^a-z]/g, "");
+			// find what log_row._rawData[2] (the frequency of submission) is closest to (fuzzy wuzzy it)
+			let status = false; // if they still need to turn it in
+			let temporary_item;
+			let lowest_fuzzy = 10000;
+			Object.keys(frequency_ofSubmission).forEach((item) => {
+				// compare item and see which we will choose
+				let distance = edit_dist(log_row._rawData[2], item);
+				if (lowest_fuzzy > distance) {
+					temporary_item = item;
+					lowest_fuzzy = distance;
+				}
+			});
 
-				log_row._rawData[2] = temporary_item;
+			log_row._rawData[2] = temporary_item;
 
-				// compare the modifed date with the files date
-				// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
-				let return_file = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
-				let use_spreadsheet; // save the index of the spreadsheet we're using for this specific file
+			// compare the modifed date with the files date
+			// ^^ NEEDS rewriting: Go into the main_log folder (of that said folder, and grab the most recent row filled in
+			let return_file = find_id(root_files, log_row._rawData[0], log_row._rawData[2]);
+			let use_spreadsheet; // save the index of the spreadsheet we're using for this specific file
 
-				main_logs.forEach((log, log_index) => { // find the main log connected to this file
-					if (log.parent_id == return_file[3]) {
-						use_spreadsheet = log_index;
-					}
-				});
-				// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
-				if (main_logs[use_spreadsheet] && return_file[0]) {
-					await new Promise((connection_promise) => {
-						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
-							if (err) console.error(err);
-							if (ignore_count.length && Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
-								status = true;
+			main_logs.forEach((log, log_index) => { // find the main log connected to this file
+				if (log.parent_id == return_file[3]) {
+					use_spreadsheet = log_index;
+				}
+			});
+			// go into this spreadsheet and look at each tab, find the one most closely resembling the tag-ids
+			if (main_logs[use_spreadsheet] && return_file[0]) {
+				await new Promise((connection_promise) => {
+					connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
+						if (err) console.error(err);
+						if (ignore_count.length && Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
+							status = true;
 
-							ignore_notifier = ignore_count.length && !status ? 1 : 0;
-							console.log("row", ignore_count, "and ignoring?", ignore_notifier, return_file[0]);
+						ignore_notifier = ignore_count.length && !status ? 1 : 0;
+						console.log("row", ignore_count, "and ignoring?", ignore_notifier, return_file[0]);
 
-							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
-							let spreadsheet_index_index = -1;
-							if (return_file[1] == "form")
-								for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
-									main_logs
-									if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
-										spreadsheet_index_index = run;
-										break;
-									}
-								};
-
-							// don't need to check if it's one of the following:
-							/*  onincident: 5,
-							    asneeded: 6,
-								correctiveaction: 7,
-								riskassesment: 8 */
-							let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
-							if (frequency_numCheck == 5 || frequency_numCheck == 6 || frequency_numCheck == 7 || frequency_numCheck == 8) {
-								status = false;
-							} else {
-								if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
-									status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
-								} else {
-									status = true;
+						// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
+						let spreadsheet_index_index = -1;
+						if (return_file[1] == "form")
+							for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
+								main_logs
+								if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
+									spreadsheet_index_index = run;
+									break;
 								}
-							}
-
-							console.log("check", log_row._rawData[2], status, ignore_notifier);
-							all_sheet_logs[index] = {
-								file_name: log_row._rawData[0],
-								file_id: return_file[0],
-								status: status,
-								ignore_notifier: ignore_notifier,
-								file_type: return_file[1],
-								frequency_ofSubmission: log_row._rawData[2]
 							};
-							return connection_promise();
-						});
-					});
 
-				} // otherwise do nothing
-			}
+						// don't need to check if it's one of the following:
+						/*  onincident: 5,
+						    asneeded: 6,
+							correctiveaction: 7,
+							riskassesment: 8 */
+						let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
+						if (frequency_numCheck == 5 || frequency_numCheck == 6 || frequency_numCheck == 7 || frequency_numCheck == 8) {
+							status = false;
+						} else {
+							if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
+								status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+							} else {
+								status = true;
+							}
+						}
+
+						console.log("check", log_row._rawData[2], status, ignore_notifier);
+						all_sheet_logs[index] = {
+							file_name: log_row._rawData[0],
+							file_id: return_file[0],
+							status: status,
+							ignore_notifier: ignore_notifier,
+							file_type: return_file[1],
+							frequency_ofSubmission: log_row._rawData[2]
+						};
+						return connection_promise();
+					});
+				});
+
+			} // otherwise do nothing
 			resolve();
 		});
 	});

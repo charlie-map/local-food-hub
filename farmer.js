@@ -37,6 +37,8 @@ function find_type(frequencies, stat_value) {
 }
 
 farmer.get("/view-status", isLoggedIn, (req, res) => {
+	console.log("PASSING??");
+	if (!req.query.username) return res.redirect("/");
 	connection.query("SELECT farm_name, id FROM farmers WHERE username=?", req.query.username, function(err, farmer) {
 		if (err) console.error(err);
 		if (!farmer || !farmer.length) return res.redirect("/");

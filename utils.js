@@ -81,7 +81,7 @@ function isLoggedIn(req, res, next) {
             updateExpiry.setSeconds(updateExpiry.getSeconds() + 3600);
             req.username = row[0].username;
             connection.query('UPDATE uuid SET expiry=? WHERE token=?', [updateExpiry, req.cookies.token], (err) => {
-                if (err) console.log(err);
+                if (err) console.log("error on update token", err);
                 res.cookie("token", req.cookies.token, {
                     expires: new Date(updateExpiry)
                 });
