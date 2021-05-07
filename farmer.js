@@ -110,7 +110,7 @@ farmer.get("/update", async (req, res) => {
 							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
 								if (err) console.error(err);
 								folder.file_type = !folder.file_type ? "unknown" : folder.file_type;
-								connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, file_type, frequency) VALUES (?, ?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.file_type, folder.frequency_ofSubmission], function(err) {
+								connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, file_type, frequency, ignore_notifier) VALUES (?, ?, ?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.file_type, folder.frequency_ofSubmission, folder.ignore_notifier], function(err) {
 									if (err) console.log(err);
 									end();
 								});

@@ -267,7 +267,7 @@ async function create_main_log_object(folder_id) {
 	// 6. preharvest = 5 ---- august 10th
 	// 7. deliverydays = 6 ---- friday and monday at 6am
 	let all_sheet_logs = [];
-	let count = 0;
+	let count = 0, ignore_notifier;
 	let row_awaiting = full_row_data.map((log_row, index) => {
 		return new Promise(async (resolve, reject) => {
 			// if (index < 7) {
@@ -305,20 +305,12 @@ async function create_main_log_object(folder_id) {
 					await new Promise((connection_promise) => {
 						connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 							if (err) console.error(err);
-							if (ignore_count.length) { // still check if today's date matches up
-								if (!Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw) {
-									status = false;
-									return connection_promise();
-								} else {
-									status = true;
-								}
-							}
-							if (status) await new Promise((resolve) => {
-								connection.query("UPDATE status SET ignore_notifier=0 WHERE file_id=?", return_file[0], err => {
-									if (err) console.error(err);
-									return connection_promise();
-								});
-							});
+							if (ignore_count.length && Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
+								status = true;
+
+							ignore_notifier = ignore_count.length && !status ? 1 : 0;
+							console.log("row", ignore_count, "and ignoring?", ignore_notifier, return_file[0]);
+
 							// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 							let spreadsheet_index_index = -1;
 							if (return_file[1] == "form")
@@ -331,8 +323,8 @@ async function create_main_log_object(folder_id) {
 								};
 
 							// don't need to check if it's one of the following:
-							/* onincident: 5,
-								asneeded: 6,
+							/*  onincident: 5,
+							    asneeded: 6,
 								correctiveaction: 7,
 								riskassesment: 8 */
 							let frequency_numCheck = frequency_ofSubmission[log_row._rawData[2]];
@@ -346,10 +338,12 @@ async function create_main_log_object(folder_id) {
 								}
 							}
 
+							console.log("check", log_row._rawData[2], status, ignore_notifier);
 							all_sheet_logs[index] = {
 								file_name: log_row._rawData[0],
 								file_id: return_file[0],
 								status: status,
+								ignore_notifier: ignore_notifier,
 								file_type: return_file[1],
 								frequency_ofSubmission: log_row._rawData[2]
 							};
