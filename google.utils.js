@@ -266,9 +266,28 @@ async function create_main_log_object(folder_id) {
 	// 5. annual = 4 ---- first monday of new year at 6am
 	// 6. preharvest = 5 ---- august 10th
 	// 7. deliverydays = 6 ---- friday and monday at 6am
-	let all_sheet_logs = [];
+	let all_sheet_logs = [], data_keep = [];
 	let count = 0, ignore_notifier;
+	let i;
 	let row_awaiting = full_row_data.map((log_row, index) => {
+		// first run through a separate data table and make sure we haven't seen this row before.
+		// This is to ensure that were won't get stuck with mutliple values connected to the same sheet (possibly for different frequencies)
+		let check_rowNum = log_row._rawData[0].split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
+		let name_ofRow = log_row._rawData[0].split(" ").splice(0, 1).join(" ").split(".")[0].toLowerCase();
+		for (i = 0; i < data_keep.length; i++) {
+			// check our current row against any other rows
+			// dist check on check_rowNum against data_keep[i][0] and name_ofRow against data_keep[i][1]
+
+			if (Math.abs(check_rowNum.length - data_keep[i][0].length) <= 1 && (check_rowNum == data_keep[i][0] || edit_dist(check_rowNum, data_keep[i][0]) <= 1) &&
+				Math.abs(name_ofRow.length - data_keep[i][1].length) <= 4 && (name_ofRow == data_keep[i][1] || edit_dist(name_ofRow, data_keep[i][1]) <= 4))
+				// if this is true, than we've found a duplicate
+				break;
+		}
+		if (i != data_keep.length - 1)
+			return; // we don't want this value
+
+		data_keep.push([check_rowNum, name_ofRow]);
+
 		return new Promise(async (resolve, reject) => {
 			// if (index < 7) {
 			// run through all the log data

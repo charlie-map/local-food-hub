@@ -53,7 +53,7 @@ app.post("/login", function(req, res) {
                 now.setSeconds(now.getSeconds() + 3600);
                 let token = uuidv4();
                 //we need to remove the old tokens first--if they exist 
-                connection.query('DELETE FROM uuid WHERE farmer_id=?', [row[0].id], (err) => {
+                connection.query('DELETE FROM uuid WHERE farmer_id=? OR farmer_id IS NULL', [row[0].id], (err) => {
                     if (err) console.log(err);
                     connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].id, now], (err) => {
                         if (err) console.log(err);
