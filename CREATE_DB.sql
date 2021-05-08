@@ -12,7 +12,7 @@ CREATE TABLE farmers (
 	root_folder VARCHAR(255) NOT NULL,
 	account_type TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(id),
-	UNIQUE INDEX `unique_farmer` (`username`, `email`)
+	UNIQUE KEY unique_farmer (username)
 );
 
 CREATE TABLE status (
