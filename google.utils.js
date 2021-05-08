@@ -67,8 +67,8 @@ async function pull_files(googleDriveInstance, main_folder_id, pull_recursive) {
 function find_id(all_files, file_name, submission_frequency) {
 	let lowest_fuzzy = 10000,
 		curr_distance, first_letter_dist;
-	let file_id, return_file_name, return_dist, parent_id, type;
-	all_files.files.forEach((file) => {
+	let file_id, return_file_name, return_dist, parent_id, type, file_index;
+	all_files.files.forEach((file, index) => {
 		curr_distance = edit_dist(file.name.trim(), file_name);
 		first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
 
@@ -78,11 +78,12 @@ function find_id(all_files, file_name, submission_frequency) {
 			return_file_name = file.name.trim();
 			parent_id = file.parents[file.parents.length - 1];
 			type = file.mimeType.split(".")[file.mimeType.split(".").length - 1];
+			file_index = index;
 		}
 	});
 
 	if (!file_id || lowest_fuzzy > 10) { // redo process, but look for a sheet instead
-		all_files.files.forEach((file) => {
+		all_files.files.forEach((file, index) => {
 			curr_distance = edit_dist(file.name.trim(), file_name);
 			first_letter_dist = edit_dist(file.name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5), file_name.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 5));
 
@@ -92,9 +93,11 @@ function find_id(all_files, file_name, submission_frequency) {
 				return_file_name = file.name.trim();
 				parent_id = file.parents[file.parents.length - 1];
 				type = file.mimeType.split(".")[file.mimeType.split(".").length - 1];
+				file_index = index;
 			}
 		});
 	}
+	all_files.files.splice(file_index, 1); // split off the file so it can't be used again
 
 	return [file_id, type, return_file_name, parent_id];
 }
@@ -268,9 +271,7 @@ async function create_main_log_object(folder_id) {
 	// 7. deliverydays = 6 ---- friday and monday at 6am
 	let all_sheet_logs = [],
 		data_keep = [];
-	let count = 0,
-		ignore_notifier;
-	let i;
+	let count = 0;
 	let row_awaiting = full_row_data.map((log_row, index) => {
 		// first run through a separate data table and make sure we haven't seen this row before.
 		// This is to ensure that were won't get stuck with mutliple values connected to the same sheet (possibly for different frequencies)
@@ -284,6 +285,7 @@ async function create_main_log_object(folder_id) {
 		let name_ofRow = initial_string[0].length < 4 ?
 			initial_string.splice(2).join(" ").split(".")[0].toLowerCase() :
 			initial_string.splice(1).join(" ").split(".")[0].toLowerCase();
+		let i;
 		for (i = 0; i < data_keep.length; i++) {
 			// check our current row against any other rows
 			// dist check on check_rowNum against data_keep[i][0] and name_ofRow against data_keep[i][1]
@@ -332,11 +334,11 @@ async function create_main_log_object(folder_id) {
 				await new Promise((connection_promise) => {
 					connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 						if (err) console.error(err);
+
 						if (ignore_count.length && Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
 							status = true;
 
-						ignore_notifier = ignore_count.length && !status ? 1 : 0;
-						console.log("row", ignore_count, "and ignoring?", ignore_notifier, return_file[0]);
+						let ignore_notifier = ignore_count.length && !status ? 1 : 0;
 
 						// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 						let spreadsheet_index_index = -1;
@@ -365,7 +367,6 @@ async function create_main_log_object(folder_id) {
 							}
 						}
 
-						console.log("check", log_row._rawData[2], status, ignore_notifier);
 						all_sheet_logs[index] = {
 							file_name: log_row._rawData[0],
 							file_id: return_file[0],
