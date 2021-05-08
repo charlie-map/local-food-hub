@@ -56,6 +56,16 @@ router.get("/create-admin", (req, res) => {
     });
 });
 
+router.get("/change-password", isLoggedIn, (req, res) => {
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        if (err) console.error(err);
+        connection.query("UPDATE farmers SET password=? WHERE username=?", [hash, req.body.username], (err) => {
+            if (err) console.error(err);
+            res.redirect("/admin" + req.body.username);
+        });
+    });
+});
+
 router.get("/view-farms", isLoggedIn, (req, res) => {
     connection.query("SELECT * FROM farmers WHERE account_type=0", function(err, farmers) {
         if (err) console.log(err);
