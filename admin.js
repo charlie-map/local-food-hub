@@ -103,7 +103,8 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
             type.push({
                 farm_name: farm.farm_name,
                 email: farm.email,
-                root_folder: farm.root_folder
+                root_folder: farm.root_folder,
+                username: farm.username
             });
         });
         res.render('farm', {
@@ -112,8 +113,28 @@ router.get("/view-farms", isLoggedIn, (req, res) => {
     });
 });
 
-router.get("/delete-farm/:email", isLoggedIn, (req, res) => {
-    connection.query("DELETE FROM farmers WHERE email=?", req.params.email, function(err, farmers) {
+router.post("/change-value", isLoggedIn, (req, res) => {
+    let body = req.body;
+    if (body.type == "root_folder") {
+        connection.query("UPDATE farmers SET root_folder=? WHERE username=?", [body.value, body.username], (err) => {
+            if (err) console.error(err);
+            return res.redirect("/view-farms");
+        });
+    } else if (body.type == "email") {
+        connection.query("UPDATE farmers SET email=? WHERE username=?", [body.value, body.username], (err) => {
+            if (err) console.error(err);
+            return res.redirect("/view-farms");
+        });
+    } else {
+        connection.query("UPDATE farmers SET farm_name=? WHERE username=?", [body.value, body.username], (err) => {
+            if (err) console.error(err);
+            return res.redirect("/view-farms");
+        });
+    }
+});
+
+router.get("/delete-farm/:username", isLoggedIn, (req, res) => {
+    connection.query("DELETE FROM farmers WHERE username=?", req.params.username, function(err, farmers) {
         if (err) console.log(err);
         res.redirect("/view-farms");
     });
