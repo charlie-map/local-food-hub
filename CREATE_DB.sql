@@ -32,3 +32,12 @@ CREATE TABLE uuid (
 	expiry DATETIME,
 	FOREIGN KEY (`farmer_id`) REFERENCES farmers (`id`) ON DELETE CASCADE
 );
+
+CREATE TABLE system_settings (
+	variable VARCHAR(255) NOT NULL,
+	string VARCHAR(255),
+	num INT,
+	UNIQUE KEY unique_setting (variable)
+);
+
+INSERT INTO system_settings (variable, num) VALUES ('admin allowance', 0);

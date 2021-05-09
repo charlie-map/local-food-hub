@@ -15,6 +15,11 @@
   <h2>Admin Page</h2>
   <!-- <p>Ayo we got some stuff goin on</p> -->
   <!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
+  <label class="switch" id="create_admin_checker">
+    <label id="label_create_admin">Turn off creating admin accounts?</label>
+    <input type="checkbox" id="check_value" {{checked}}>
+    <span class="slider round" id="slider"></span>
+  </label>
   
   <form method="get" action="/view-farms">
     <button class="view-button">View Farms</button>

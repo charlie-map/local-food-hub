@@ -24,10 +24,20 @@ $("#submit").click(function(event) {
 });
 
 $(".view_popup").click(() => {
-	console.log("hgello");
 	$("#reset_password_popup").toggle();
 });
 
 $("#close_popup").click(() => {
 	$("#reset_password_popup").toggle();
+});
+
+$("#slider").click(() => {
+	let checked = !$('#check_value').is(':checked') ? 1 : 0;
+	$.ajax({
+		type: "GET",
+		url: "/toggle-create-admin/" + checked,
+		success: function(result) {
+			location.reload();
+		}
+	});
 });
