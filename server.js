@@ -88,7 +88,6 @@ app.get("/logout", isLoggedIn, (req, res) => {
             });
             res.end("thanks!");
         });
-
     });
 });
 

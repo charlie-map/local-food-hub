@@ -55,7 +55,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					USERNAME: req.query.username,
 					FILE_NAME: stat.file_name,
 					FILE_ID: stat.file_id,
-					FILE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
+					FILE_URL: stat.file_type + "/" + stat.file_id,
 					STATUS: stat.status == "true" && stat.ignore_notifier == 0 ? true : false
 				});
 				if (stat.status == "true" && stat.ignore_notifier == 0)
@@ -63,7 +63,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 						USERNAME: req.query.username,
 						FILE_NAME: stat.file_name,
 						FILE_ID: stat.file_id,
-						FILE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
+						FILE_URL: stat.file_type + "/" + stat.file_id,
 						STATUS: true
 					});
 			});
@@ -76,15 +76,37 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 	});
 });
 
-farmer.get("/check-off/:username/:file_id", isLoggedIn, (req, res) => {
-	connection.query("SELECT id FROM farmers WHERE username=?", req.params.username, (err, farm_id) => {
-		if (err) console.error(err);
-		if (!farm_id.length) res.redirect("/");
-		connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, req.params.file_id], (err) => {
-			if (err) console.error(err);
-			res.redirect("/farm/view-status?username=" + req.params.username);
+function ignore_file(username, file_id) {
+	return new Promise((resolve, reject) => {
+		connection.query("SELECT id FROM farmers WHERE username=?", username, (err, farm_id) => {
+			if (err) reject(err);
+			if (!farm_id.length) resolve(false);
+			connection.query("UPDATE status SET ignore_notifier=1 WHERE farmer_id=? AND file_id=?", [farm_id[0].id, file_id], (err) => {
+				if (err) reject(err);
+				resolve(true);
+			});
 		});
 	});
+}
+
+farmer.get("/check-off/:username/:file_id", isLoggedIn, async (req, res) => {
+	let return_value = await ignore_file(req.params.username, req.params.file_id);
+	if (return_value == true)
+		res.redirect("/farm/view-status?username=" + req.params.username);
+	else {
+		console.log(return_value);
+		res.redirect("/");
+	}
+});
+
+farmer.post("/fill-out", isLoggedIn, async (req, res) => {
+	let return_value = await ignore_file(req.body.username, req.body.file_id);
+	if (return_value == true) {// direct to the google doc
+		return res.end("https://docs.google.com/" + req.body.type + "s/d/" + req.body.file_id + "/edit");
+	} else {
+		console.log(return_value);
+		res.redirect("/");
+	}
 });
 
 farmer.post("/reset-password", isLoggedIn, (req, res) => {

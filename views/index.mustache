@@ -22,7 +22,7 @@
 		<div id = 'statusoftype'>{{#need_turnin}}
 			<div id="styling">
 				<span id="file_name"> {{FILE_NAME}}</span>
-				<a href="{{FILE_URL}}"><button title="Click here to fill out form" id="fill_out"><i class="fas fa-edit"></i></button></a>
+				<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
 				<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
 			</div>
 		{{/need_turnin}}</div>
@@ -34,7 +34,7 @@
 					<span id="file_name"> {{FILE_NAME}}</span>
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
-						<a href="{{FILE_URL}}"><button title="Click here to fill out form" id="fill_out"><i class="fas fa-edit"></i></button></a>
+						<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
 						<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}" title="Ignore this form"><i class="fas fa-times-circle"></i>
 						</button>
 					{{/STATUS}}

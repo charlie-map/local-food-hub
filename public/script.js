@@ -41,3 +41,20 @@ $("#reset_password").click(() => {
 $("#close_popup").click(() => {
 	$("#reset_password_popup").toggle();
 });
+
+$(".fill_out").click(function() {
+	let id = this.id.split("/");
+	$.ajax({
+		type: "POST",
+		url: "/farm/fill-out",
+		dataType: 'html',
+		data: {
+			username: id[0],
+			type: id[1],
+			file_id: id[2]
+		},
+		success: function(result) {
+			window.location = result;
+		}
+	})
+});
