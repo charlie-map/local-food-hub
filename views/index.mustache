@@ -22,7 +22,7 @@
 		<div id = 'statusoftype'>{{#need_turnin}}
 			<span id="file_name"> {{FILE_NAME}}</span>
 			<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
-			<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
+			<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
 		{{/need_turnin}}</div>
 
 		<div id='allStati'>{{#type}}{{#.}}
@@ -33,10 +33,11 @@
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
 						<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
-						<button class="ignore_file" id="{{USERNAME}}/{{FILE_ID}}">Ignore</button>
+						<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}" title="Ignore this form"><i class="fas fa-times-circle"></i>
+						</button>
 					{{/STATUS}}
 					{{^STATUS}}
-						<a href="{{FILE_URL}}"><button id="complete">Completed</button></a>
+						<a href="{{FILE_URL}}"><button title="This item is completed, but you can still turn it in" id="complete"><i class="fas fa-check"></i></button></a>
 					{{/STATUS}}
 				{{/row}}</div>
 			</ul>
@@ -58,5 +59,6 @@
 		</div>
 	</main>
 	<script src="/script.js"></script>
+	<script src="https://kit.fontawesome.com/3787aa0e64.js" crossorigin="anonymous"></script>
 </body>
 </html>

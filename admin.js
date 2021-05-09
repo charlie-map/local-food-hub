@@ -37,7 +37,6 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
     };
     bcrypt.hash(req.body.psw, saltRounds, function(err, hash) {
         test.password = hash;
-        console.log("insert", test);
         connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder) VALUES (?, ?, ?, ?, ?)", Object.values(test), function(err) {
             if (err) {
                 console.log("err?", err.errno, err);
