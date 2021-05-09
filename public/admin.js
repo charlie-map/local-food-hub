@@ -1,3 +1,5 @@
+$("#reset_password_popup").hide();
+
 $("#submit").click(function(event) {
 	event.preventDefault();
 	$.ajax({
@@ -19,4 +21,13 @@ $("#submit").click(function(event) {
 			}
 		}
 	});
+});
+
+$(".view_popup").click(() => {
+	console.log("hgello");
+	$("#reset_password_popup").toggle();
+});
+
+$("#close_popup").click(() => {
+	$("#reset_password_popup").toggle();
 });

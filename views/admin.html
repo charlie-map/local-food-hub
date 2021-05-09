@@ -3,6 +3,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/admin.css">
+  <link rel="stylesheet" href="/login.css">
+  <link rel="stylesheet" href="/style.css" />
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
   <title>Local Food Hub ⚪ Admin Page</title>
@@ -18,7 +21,7 @@
   </form>
 
   <!-- <a href="/view-farms" class="view-button">View Farms</a> -->
-  <button class="open-button" onclick="openForm()">Add Farm</button>
+  <button class="view-button" onclick="openForm()">Add Farm</button>
 
   <div class="form-popup" id="myForm">
     <form action="/make-farm" method="POST" class="form-container">
@@ -53,6 +56,21 @@
       document.getElementById("myForm").style.display = "none";
     }
   </script>
+    <button class="view_popup">
+      Reset password
+    </button>
+
+    <div class="form-popup" id="reset_password_popup">
+      <form method="POST" action="/change-password" class="form-container">
+        <input type="text" placeholder="Enter username" name="username" required>
+
+        <input type="password" placeholder="Enter new password" name="password" required>
+
+        <button type="submit" class="btn">Submit</button>
+        <button type="button" id="close_popup" class="btn cancel">Close</button>
+      </form>
+    </div>
+
   <script src="/admin.js"></script>
 </body>
 </html>
