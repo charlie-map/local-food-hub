@@ -41,3 +41,4 @@ CREATE TABLE system_settings (
 );
 
 INSERT INTO system_settings (variable, num) VALUES ('admin allowance', 0);
+INSERT INTO system_settings (variable, string) VALUES ('service account', 'foodboyr3@localfoodhub.iam.gserviceaccount.com');

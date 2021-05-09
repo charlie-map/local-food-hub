@@ -38,14 +38,17 @@
       <label for="username"><b>Username</b></label>
       <input type="text" placeholder="Ex. bellair_farm" name="username" id="username" required>
 
+      <div class="help-tip">
+        <p>This is the long string of letters in the url of the folder. It should look something like this: 1gTpKQ1eFgI5iU5TT0_3A4NJUs4D2zD9w. Along with this, please remember to share the folder with our service account so it can check out this folder at: {{service_account}}</p>
+      </div>
+      <label for="root_folder"><b>Main Folder ID</b></label>
+      <input type="text" placeholder="Enter Folder ID" name="root_folder" id="root_folder" required>
+
       <label for="email"><b>Email</b></label>
       <input type="text" placeholder="Ex. jsmith@gmai.com" name="email" id="email" required>
 
       <label for="initial_password"><b>Password</b></label>
       <input type="password" placeholder="Ex. password165!" name="psw" id="password" required>
-
-      <label for="root_folder"><b>Main Folder ID</b></label>
-      <input type="text" placeholder="Enter Folder ID" name="root_folder" id="root_folder" required>
       
       <button type="submit" class="btn" id="submit">Submit</button>
       <button type="button" class="btn cancel" onclick="closeForm()">Close</button>

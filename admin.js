@@ -17,9 +17,13 @@ router.get("/admin", isLoggedIn, (req, res) => {
     connection.query("SELECT num FROM system_settings WHERE variable='admin allowance'", (err, num) => {
         if (err) console.error(err);
         num[0].num = num[0].num ? "checked" : "";
+        connection.query("SELECT string FROM system_settings WHERE variable='service account'", (err, account) => {
+            if (err) console.error(err);
         res.render("admin", {
-            checked: num[0].num
+            checked: num[0].num,
+            service_account: account[0].string
         });
+    });
     });
 });
 
