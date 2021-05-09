@@ -37,10 +37,12 @@
 
   #list:nth-child(odd) {
     background-color: #CCFFCC;
+    border-radius: 7px;
   }
   
   #list:nth-child(even) {
     background-color: white;
+    border-radius: 7px;
   }
 
   #title{
@@ -166,7 +168,7 @@ footer {
   }*/
 
 #statusoftype {
-  display: grid;
+  display: inline;
 }
 
 #reset_password {
@@ -180,4 +182,15 @@ footer {
   width: calc(100vw - 60px);
   top: calc(2vw - 180px);
   right: calc(10vw - 400px);
+}
+
+#styling {
+  background: #F5F5F5;
+  padding: 8px;
+  border: 4px;
+  border-radius: 5px;
+}
+
+#styling:nth-child(odd) {
+  background-color: #CCFFCC;
 }

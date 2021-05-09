@@ -18,27 +18,30 @@
 	</header>
 	<main>
 
-		<h2>Current Forms</h2>
+		<h2>Require Forms</h2>
 		<div id = 'statusoftype'>{{#need_turnin}}
-			<span id="file_name"> {{FILE_NAME}}</span>
-			<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
-			<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
+			<div id="styling">
+				<span id="file_name"> {{FILE_NAME}}</span>
+				<a href="{{FILE_URL}}"><button title="Click here to fill out form" id="fill_out"><i class="fas fa-edit"></i></button></a>
+				<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
+			</div>
 		{{/need_turnin}}</div>
 
 		<div id='allStati'>{{#type}}{{#.}}
 			<ul id="list">
-				<span id = "title">{{titleoftype}}</span>
-				<div id = 'statusoftype'>{{#row}}
+				<span id = "title">{{titleoftype}}</span><br>
+				<div id='statusoftype1'>{{#row}}
 					<span id="file_name"> {{FILE_NAME}}</span>
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
-						<a href="{{FILE_URL}}"><button id="fill_out">Fill out</button></a>
+						<a href="{{FILE_URL}}"><button title="Click here to fill out form" id="fill_out"><i class="fas fa-edit"></i></button></a>
 						<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}" title="Ignore this form"><i class="fas fa-times-circle"></i>
 						</button>
 					{{/STATUS}}
 					{{^STATUS}}
 						<a href="{{FILE_URL}}"><button title="This item is completed, but you can still turn it in" id="complete"><i class="fas fa-check"></i></button></a>
 					{{/STATUS}}
+					<br>
 				{{/row}}</div>
 			</ul>
 		{{/.}}{{/type}}</div>
