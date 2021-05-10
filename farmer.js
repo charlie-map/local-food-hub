@@ -56,6 +56,7 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 					FILE_NAME: stat.file_name,
 					FILE_ID: stat.file_id,
 					FILE_URL: stat.file_type + "/" + stat.file_id,
+					GOOGLE_URL: "https://docs.google.com/" + stat.file_type + "s/d/" + stat.file_id + "/edit",
 					STATUS: stat.status == "true" && stat.ignore_notifier == 0 ? true : false
 				});
 				if (stat.status == "true" && stat.ignore_notifier == 0)

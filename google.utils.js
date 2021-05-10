@@ -212,7 +212,7 @@ async function create_main_log_object(folder_id) {
 
 	let weekly_value = new Date(moment().day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
 	weekly_value = new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
-	weekly_value = Sugar.Date.isFuture(weekly_value) ? new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate() - 7, daily_value[0]) : new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
+	weekly_value = Sugar.Date.isFuture(weekly_value).raw ? new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate() - 7, daily_value[0]) : new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
 	all_dates.weekly = weekly_value;
 
 	// get first week of this month
@@ -237,10 +237,10 @@ async function create_main_log_object(folder_id) {
 		if (all_dates.annual.getDay() == 1)
 			break;
 	}
-	if (Sugar.Date.isFuture(all_dates.annual)) all_dates.annual = new Date(new Date(all_dates.annual).getFullYear() - 1, 0, new Date(all_dates.annual).getDay(), daily_value[0]);
+	if (Sugar.Date.isFuture(all_dates.annual).raw) all_dates.annual = new Date(new Date(all_dates.annual).getFullYear() - 1, 0, new Date(all_dates.annual).getDay(), daily_value[0]);
 
 	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
-	while (Sugar.Date.isFuture(preharvest_date)) {
+	while (Sugar.Date.isFuture(preharvest_date).raw) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	}
 	all_dates.preharvest = preharvest_date;
@@ -253,13 +253,17 @@ async function create_main_log_object(folder_id) {
 	all_dates.deliverydays.forEach((day, index) => {
 		curr_date = Sugar.Date.create(day);
 		curr_date = Sugar.Date(curr_date).isFuture().raw ? new Date(curr_date.getFullYear(), curr_date.getMonth(), curr_date.getDate() - 7) : curr_date;
-		if (Sugar.Date(recent_date).isAfter(curr_date) && (Sugar.Date(curr_date).isAfter(all_dates.deliverydays[recent]) || index == 0)) {
+		if (Sugar.Date(recent_date).isAfter(curr_date).raw && (Sugar.Date(curr_date).isAfter(all_dates.deliverydays[recent]).raw || index == 0)) {
 			recent = index;
 			recent_date = curr_date;
 		};
 	});
 
 	all_dates.deliverydays = recent_date;
+
+	Object.values(all_dates).forEach((item) => {
+		item = new Date(item.getFullYear(), item.getMonth(), item.getDate(), item.getHours() - 4, item.getMinutes(), item.getSeconds());
+	});
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
 	// 2. weekly = 1 ---- mondays at 6am
@@ -361,6 +365,7 @@ async function create_main_log_object(folder_id) {
 						} else {
 							if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
 								status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
+								if (log_row._rawData[2] == "daily") console.log("changing values", log_row._rawData[0], status, "\n");
 							} else {
 								status = true;
 							}
@@ -393,11 +398,14 @@ function check_status(google_sheet, all_dates, indicated_date, specific_spreadsh
 			try {
 				spreadsheet_rows = await google_sheet[specific_spreadsheet].doc.sheetsByIndex[specific_index].getRows();
 				// grab most recent value (specifically the timestamp) in the table
+				if (indicated_date == "daily") console.log(spreadsheet_rows);
 				if (!spreadsheet_rows[spreadsheet_rows.length - 1]) {
 					return resolve(true); // check to make sure there are values
 				}
 				let timestamp = spreadsheet_rows[spreadsheet_rows.length - 1] && spreadsheet_rows[spreadsheet_rows.length - 1]._rawData ? new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]) : undefined;
-				if (all_dates[indicated_date] && timestamp && Sugar.Date(all_dates[indicated_date]).isAfter(timestamp)) {
+				timestamp = new Date(timestamp.toLocaleString("en-US", {timeZone: "America/New_York"}));
+				timestamp = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours() - 4);
+				if (all_dates[indicated_date] && timestamp && Sugar.Date(all_dates[indicated_date]).isAfter(timestamp).raw) {
 					return resolve(true);
 				}
 			} catch (error) {

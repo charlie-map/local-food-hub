@@ -1,3 +1,6 @@
+if (window.performance && window.performance.navigation.type === 2)
+	window.location.reload();
+
 $("#reset_password_popup").hide();
 // var text = '[{allStati}]'
 // var obj = JSON.parse(text);
