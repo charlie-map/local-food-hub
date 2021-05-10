@@ -21,7 +21,8 @@ router.get("/admin", isLoggedIn, (req, res) => {
             if (err) console.error(err);
         res.render("admin", {
             checked: num[0].num,
-            service_account: account[0].string
+            service_account: account[0].string,
+            password_change: req.query["pw-changed"] ? "Your password has been changed!" : ""
         });
     });
     });
@@ -90,7 +91,7 @@ router.post("/change-password", isLoggedIn, (req, res) => {
         if (err) console.error(err);
         connection.query("UPDATE farmers SET password=? WHERE username=?", [hash, req.body.username], (err) => {
             if (err) console.error(err);
-            res.redirect("/admin");
+            res.redirect("/admin?pw-changed=done");
         });
     });
 });

@@ -299,3 +299,9 @@ input:checked + .slider:before {
     0% { opacity:0; }
     100% { opacity:100%; }
 }
+
+#change_password {
+  position: absolute;
+  top: 9%;
+  right: 5%;
+}
