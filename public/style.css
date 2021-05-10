@@ -194,3 +194,9 @@ footer {
 #styling:nth-child(odd) {
   background-color: #CCFFCC;
 }
+
+#change_password {
+  position: absolute;
+  top: 17%;
+  right: 5%;
+}

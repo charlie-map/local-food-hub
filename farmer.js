@@ -71,7 +71,8 @@ farmer.get("/view-status", isLoggedIn, (req, res) => {
 			res.render("index", {
 				farm_name: farmer[0].farm_name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
 				type,
-				need_turnin
+				need_turnin,
+				password_change: req.query["pw-changed"] ? "Your password has been changed!" : ""
 			});
 		});
 	});
@@ -115,7 +116,8 @@ farmer.post("/reset-password", isLoggedIn, (req, res) => {
 		if (err) console.error(err);
 		connection.query("UPDATE farmers SET password=? WHERE username=?", [hash, req.body.username], (err) => {
 			if (err) console.error(err);
-			res.redirect("/farm/view-status?username=" + req.body.username);
+			console.log("redirect");
+			res.redirect("/farm/view-status?username=" + req.body.username + "&pw-changed=done");
 		});
 	});
 });
