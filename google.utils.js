@@ -262,7 +262,7 @@ async function create_main_log_object(folder_id) {
 	all_dates.deliverydays = recent_date;
 
 	Object.values(all_dates).forEach((item) => {
-		item = new Date(item.getFullYear(), item.getMonth(), item.getDate(), item.getHours() - 4, item.getMinutes(), item.getSeconds());
+		item = new Date(item.getFullYear(), item.getMonth(), item.getDate(), item.getHours(), item.getMinutes() - item.getTimezoneOffset(), item.getSeconds());
 	});
 
 	// 1. daily = 0 ---- every day at 6am (weekends?)
@@ -403,8 +403,7 @@ function check_status(google_sheet, all_dates, indicated_date, specific_spreadsh
 					return resolve(true); // check to make sure there are values
 				}
 				let timestamp = spreadsheet_rows[spreadsheet_rows.length - 1] && spreadsheet_rows[spreadsheet_rows.length - 1]._rawData ? new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]) : undefined;
-				timestamp = new Date(timestamp.toLocaleString("en-US", {timeZone: "America/New_York"}));
-				timestamp = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours() - 4);
+				timestamp = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes() - new Date().getTimezoneOffset());
 				if (all_dates[indicated_date] && timestamp && Sugar.Date(all_dates[indicated_date]).isAfter(timestamp).raw) {
 					return resolve(true);
 				}
