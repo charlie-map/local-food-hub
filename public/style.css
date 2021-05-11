@@ -5,7 +5,7 @@
   }*/
 
   body {
-    font-family: verdana;
+    font-family: 'Trebuchet MS', sans-serif;
     background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
     background-repeat: no-repeat;
     background-size: cover;
@@ -37,10 +37,12 @@
 
   #list:nth-child(odd) {
     background-color: #CCFFCC;
+    border-radius: 7px;
   }
   
   #list:nth-child(even) {
     background-color: white;
+    border-radius: 7px;
   }
 
   #title{
@@ -166,7 +168,7 @@ footer {
   }*/
 
 #statusoftype {
-  display: grid;
+  display: inline;
 }
 
 #reset_password {
@@ -180,4 +182,21 @@ footer {
   width: calc(100vw - 60px);
   top: calc(2vw - 180px);
   right: calc(10vw - 400px);
+}
+
+#styling {
+  background: #F5F5F5;
+  padding: 8px;
+  border: 4px;
+  border-radius: 5px;
+}
+
+#styling:nth-child(odd) {
+  background-color: #CCFFCC;
+}
+
+#change_password {
+  position: absolute;
+  top: 17%;
+  right: 5%;
 }

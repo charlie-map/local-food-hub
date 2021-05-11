@@ -1,3 +1,6 @@
+if (window.performance && window.performance.navigation.type === 2)
+	window.location.reload();
+
 $("#reset_password_popup").hide();
 // var text = '[{allStati}]'
 // var obj = JSON.parse(text);
@@ -40,4 +43,21 @@ $("#reset_password").click(() => {
 
 $("#close_popup").click(() => {
 	$("#reset_password_popup").toggle();
+});
+
+$(".fill_out").click(function() {
+	let id = this.id.split("/");
+	$.ajax({
+		type: "POST",
+		url: "/farm/fill-out",
+		dataType: 'html',
+		data: {
+			username: id[0],
+			type: id[1],
+			file_id: id[2]
+		},
+		success: function(result) {
+			window.location = result;
+		}
+	})
 });

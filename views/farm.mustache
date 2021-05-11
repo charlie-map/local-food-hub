@@ -5,15 +5,40 @@
 <link rel="shortcut icon" type="image/png" href="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/footer-seal.png">
 <head>
 	<!-- import the webpage's stylesheet -->
-	<link rel="stylesheet" href="/style.css" />
+	<link rel="stylesheet" href="/style.css"/>
+	<link rel="stylesheet" href="/login.css"/>
 	<title>Show Farms</title>
 	<!-- import the webpage's client-side javascript file -->
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
 	<form method="get" action="/admin">
 		<button class="return-button">Return</button>
 	</form>
+
+	<div class="form-popup" id="build-edit-response">
+      <form method="POST" action="/change-value" class="form-container">
+        <h1 id="title"></h1>
+
+        <input style="visibility: hidden; position: absolute; top: -10px" name="type" id="type-qualify">
+        <input style="visibility: hidden; position: absolute; top: -10px" name="username" id="name-qualify">
+        <input type="text" id="input-changer" placeholder="" name="value" required>
+
+        <button type="submit" class="btn">Submit</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </form>
+    </div>
+
+    <script>
+      function openForm() {
+        document.getElementById("build-edit-response").style.display = "block";
+      }
+
+      function closeForm() {
+        document.getElementById("build-edit-response").style.display = "none";
+      }
+    </script>
 
 	<table>
 		<tr>
@@ -23,18 +48,15 @@
 		</tr>
 		<div id = 'allStati'>{{#type}}{{#.}}
 			<tr>
-				<td><span id=#farm-name>{{farm_name}}</span></td>
-				<td><span id=#email>{{email}}</span></td>
-				<td><span id=#root-folder>{{root_folder}}</span></td>
-				<td>
-					<form method="get" action="/delete-farm/{{email}}">
-						<button class="delete-button"><i class="fas fa-trash"></i></button>
-					</form>
-				</td>
+				<td><span id=#farm-name>{{farm_name}}  <button title="Edit the farm's name" class="re-fill-farm-name" id="{{username}}"><i class="fas fa-edit"></i></button></span></td>
+				<td><span id=#email>{{email}}  <button title="Edit the farm's email" class="re-fill-email" id="{{username}}"><i class="fas fa-edit"></i></button></span></td>
+				<td><span id=#root-folder>{{root_folder}}  <button title="Edit the folder ID" class="re-fill-id" id="{{username}}"><i class="fas fa-edit"></i></button></span></td>
+				<td><button class="delete-button" title="Delete farm" id="{{username}}"><i class="fas fa-trash"></i></button></td>
 			</tr>
 		{{/.}}{{/type}}</div>
 	</table>
 </main>
+ <script src="/admin.js"></script>
 <script src="https://kit.fontawesome.com/3787aa0e64.js" crossorigin="anonymous"></script>
 </body>
 </html>
