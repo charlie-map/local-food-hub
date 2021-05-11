@@ -365,7 +365,6 @@ async function create_main_log_object(folder_id) {
 						} else {
 							if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
 								status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
-								if (log_row._rawData[2] == "daily") console.log("changing values", log_row._rawData[0], status, "\n");
 							} else {
 								status = true;
 							}
@@ -398,7 +397,6 @@ function check_status(google_sheet, all_dates, indicated_date, specific_spreadsh
 			try {
 				spreadsheet_rows = await google_sheet[specific_spreadsheet].doc.sheetsByIndex[specific_index].getRows();
 				// grab most recent value (specifically the timestamp) in the table
-				if (indicated_date == "daily") console.log(spreadsheet_rows);
 				if (!spreadsheet_rows[spreadsheet_rows.length - 1]) {
 					return resolve(true); // check to make sure there are values
 				}
