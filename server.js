@@ -86,6 +86,7 @@ app.get("/logout", isLoggedIn, (req, res) => {
             res.cookie('token', 'whatever', {
                 expires: new Date(Date.now(0))
             });
+            res.redirect("/views/login.html");
             res.end("thanks!");
         });
     });
