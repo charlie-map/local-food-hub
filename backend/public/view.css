@@ -1,0 +1,80 @@
+/* this file is loaded by index.html and styles the page */
+
+/** {
+  box-sizing: border-box;
+}*/
+
+body {
+  font-family: verdana;
+  background-color: white
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: 2em 1em;
+  line-height: 2.5em;
+  opacity: 0.9;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 50px;
+  text-align: center;
+  color: #006400;
+  line-height: 1.1;
+}
+
+/*form {
+  background-color: #f5fff5;
+  margin: auto;
+  display: grid;
+}
+*/
+table, th, td {
+  padding: 10px;
+  text-align: left;
+  margin: auto;
+}
+
+table {
+  border-collapse:separate;
+  border-radius:10px;
+  -moz-border-radius:6px;
+  background-color: #F5F5F5;
+}
+
+#status th {
+  background-color: #F5F5F5;
+  font-size: 25px;
+  color: #303030;
+}
+
+#status tr {
+  background-color: #E8E8E8;
+  font-size: 17px;
+}
+
+#status tr:nth-child(even) {
+  background-color: #B3FFC5;
+}
+
+label {
+  font-weight: bold;
+}
+
+button {
+  border-collapse:separate;
+  border-radius:10px;
+  -moz-border-radius:6px;
+  border: 2px solid #006400;
+  background-color: white;
+  color: #006400;
+  padding: 10px 15px;
+  font-size: 15px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+button:hover {
+  background-color: #006400;
+  color: white;
+}

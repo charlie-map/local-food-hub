@@ -1,0 +1,33 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+<!DOCTYPE html>
+<html lang="en">
+<!-- import the webpage's stylesheet -->
+<link rel="stylesheet" href="/view.css" />
+
+<!-- import the webpage's client-side javascript file -->
+</head>
+<body>
+	<header>
+		<h1>View Farms Homepage Test</h1>
+
+	</header>
+	<main>
+		<div id = 'farmers'>{{#FARMERS}}
+			<div id = "farmer">{{#FARMER}}
+				<span id="farmer_name"> {{FARMER_NAME}}</span>
+				<span id="farmer_username"> {{FARMER_USERNAME}}</span>
+				<button class="deletefarmAdmin" id="{{id}}" target="{{adminDecide}}">Delete Farm</button>
+			{{/FARMER}}</div>
+		{{/FARMERS}}</div>
+	</main>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			$("#Farms").on('click','.btnDelete',function(){
+				$(this).closest('tr').remove();
+			});
+		});
+	</script>
+</body>
+</html>

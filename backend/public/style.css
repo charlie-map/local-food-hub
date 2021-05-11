@@ -1,0 +1,143 @@
+/* this file is loaded by index.html and styles the page */
+
+/** {
+  box-sizing: border-box;
+  }*/
+
+  body {
+    font-family: verdana;
+    background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 2em 1em;
+    line-height: 2.5em;
+    opacity: 0.9;
+  }
+
+  h1 {
+    font-weight: bold;
+    font-size: 50px;
+    text-align: center;
+    color: #006400;
+    line-height: 1.1;
+  }
+
+  #allStati {
+    margin-top: none;
+    position: static;
+    width: 85%;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding: 50px;
+    border-radius: 18px;
+    color: #001f3f;
+    font-size: 20px
+    box-shadow: 6px 5px 24px #666666;
+  }
+
+  #list:nth-child(odd) {
+    background-color: #CCFFCC;
+  }
+  
+  #list:nth-child(even) {
+    background-color: white;
+  }
+
+  #title{
+    font-family: sans-serif;
+    font-style: bold;
+    font-size: 40px;
+  }
+
+  button{
+    border-collapse:separate;
+    border-radius:10px;
+    -moz-border-radius:6px;
+    border: 2px solid #006400;
+    background-color: white;
+    color: #006400;
+    padding: 5px 10px;
+    font-size: 15px;
+    cursor: pointer;
+    margin: 0 auto;
+  }
+
+  button:hover {
+    background-color: #006400;
+    color: white;
+  }
+/*form {
+  background-color: #f5fff5;
+  margin: auto;
+  display: grid;
+  grid-gap: 1em;
+  padding: 2em;
+  max-width: 100ch;
+  }*/
+
+  table, th, td {
+    padding: 10px;
+    text-align: center;
+    margin: auto;
+  }
+
+  table {
+    border-collapse:separate;
+    border-radius:10px;
+    -moz-border-radius:6px;
+    background-color: #F5F5F5;
+  }
+
+  #status th {
+    background-color: #F5F5F5;
+    font-size: 25px;
+    color: #303030;
+  }
+
+  #status tr {
+    background-color: #E8E8E8;
+    font-size: 17px;
+  }
+
+  #status tr:nth-child(even) {
+    background-color: #B3FFC5;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+/*input {
+  border: 1px solid silver;
+  display: block;
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding: 5px;
+  width: 100%;
+  }*/
+
+/*form button {
+  background-color: #bbbbf2;
+  border: 2px solid currentColor;
+  border-radius: 0.25em;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: 1.4em;
+  padding: 0.25em 1em;
+  max-width: 20ch;
+}
+
+form button:hover {
+  background-color: lavender;
+}
+
+footer {
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 1px solid lightgrey;
+  }*/
+
+#statusoftype {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}

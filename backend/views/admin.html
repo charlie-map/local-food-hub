@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+  <h2>Admin Page</h2>
+  <!-- <p>Ayo we got some stuff goin on</p> -->
+  <!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
+  
+  <!-- <form method="get" action="/view-farms">
+    <button class="view-button">View Farms</button>
+  </form>
+ -->
+  <a href="/view-farms" class="view-button">View Farms</a>
+  <button class="open-button" onclick="openForm()">Add Farm</button>
+
+  <div class="form-popup" id="myForm">
+    <form action="/make-farm" method="POST" class="form-container">
+      <h1>Add Farm</h1>
+
+      <label for="farmname"><b>Farm Name</b></label>
+      <input type="text" placeholder="Ex. Bellair Farm" name="farmname" required>
+
+      <label for="username"><b>Username</b></label>
+      <input type="text" placeholder="Ex. bellair_farm" name="username" required>
+
+      <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Ex. jsmith@gmai.com" name="email" required>
+
+      <label for="initial_password"><b>Password</b></label>
+      <input type="password" placeholder="Ex. password165!" name="psw" required>
+
+      <label for="root-folder"><b>Main Folder ID</b></label>
+      <input type="text" placeholder="Enter Folder ID" name="root-folder" required>
+
+      <button type="submit" class="btn">Submit</button>
+      <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+  </div>
+
+  <script>
+    function openForm() {
+      document.getElementById("myForm").style.display = "block";
+    }
+
+    function closeForm() {
+      document.getElementById("myForm").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>

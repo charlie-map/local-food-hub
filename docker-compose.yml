@@ -1,0 +1,43 @@
+version: "3.3"
+
+#everything under services is my containers
+services:
+  mysql: 
+    container_name: lfa
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} #up to us doesn't matter never used
+    restart: always
+    volumes: 
+      - mysql_data:/var/lib/myqsl
+      - ./database/CREATE_DB.sql:/docker-entrypoint-initdb.d/CREATE_DB.sql\
+    ports: 
+      - 3306:3306
+  backend:
+    container_name: lfa_backend
+    depends_on: 
+      - mysql
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes: 
+      - ./backend:/local-food-hub 
+      - /local-food-hub/node_modules 
+    restart: always
+    expose: 
+      - 6969
+    ports: 
+      - 6969:6969 
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command: npm run dev
+
+
+volumes: 
+  mysql_data:
