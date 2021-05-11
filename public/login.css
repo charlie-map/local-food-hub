@@ -1,6 +1,6 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #CCFFCC;
+  background-image: url("https://www.dailysignal.com/wp-content/uploads/FarmRows-1250x650.jpg");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -32,7 +32,7 @@ body {
   }*/
 
   button:hover {
-    background-color: #006400;
+    background-color: #7d0849;
     color: white;
   }
 
@@ -41,18 +41,15 @@ body {
     border-collapse:separate;
     border-radius:10px;
     -moz-border-radius:6px;
+    border: 2px solid #7d0849;
     background-color: white;
-    color: #006400;
-    padding: 16px 20px;
-    font-size: 30px;
-    border: 2px solid #006400;  
+    color: #7d0849;
+    padding: 30px 40px;
+    font-size: 25px;
     cursor: pointer;
-    /*opacity: 0.8;*/
-    position: absolute;
-    width: 280px;
-    height: 100px;
-    right: 630px;
-    margin-top: 300px;
+    display: block;
+    margin: 0 auto;
+    display: block;
   }
 
   /* The popup form - hidden by default */
@@ -60,8 +57,7 @@ body {
     display: none;  
     position: absolute;
     bottom: 0;
-    right: 610px;
-    margin-bottom: 200px;
+    margin: 0 auto;
     z-index: 9;
   }
 
