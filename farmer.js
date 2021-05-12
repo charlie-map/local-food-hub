@@ -143,7 +143,7 @@ farmer.get("/update", async (req, res) => {
 					console.log(date);
 					let status = await create_main_log_object(item.root_folder, date);
 					if (!status || !status.length) return resolve();
-					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
+					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
 						if (err) console.error(err);
 						let stat = status.map(function(folder) {
 							// when we run through here, this would be the best spot to send the email:
