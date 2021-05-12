@@ -184,7 +184,7 @@ button:hover {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #7d0849;
 }
 
 input:focus + .slider {
@@ -208,14 +208,17 @@ input:checked + .slider:before {
 
 #create_admin_checker {
   position: absolute;
-  margin-top: 10%;
+  margin-top: 1%;
 }
 
 #label_create_admin {
   position: absolute;
-  top: -480%;
+  line-height: 1.1;
+  top: -260%;
   width: 170%;
+  color: #7d0849;
 }
+
 
 .help-tip{
     position: absolute;
