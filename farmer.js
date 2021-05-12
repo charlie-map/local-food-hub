@@ -185,7 +185,7 @@ farmer.get("/update", async (req, res) => {
 							if (folder.status) {
 								let string_date = (new Date().getFullYear() != folder.turn_in_date.getFullYear() ||
 									new Date().getMonth() != folder.turn_in_date.getMonth() || new Date().getDate() != folder.turn_in_date.getDate()) ?
-								"was awhile ago" : "was due today";
+								"due awhile ago" : "due today";
 								build_status = { ...build_status,
 									...{
 										[folder.file_name]: " - " + string_date
