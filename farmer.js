@@ -139,8 +139,7 @@ farmer.get("/update", async (req, res) => {
 						new Date(2021, 0, 4)
 						new Date(1967, 7, 8)
 					*/
-					let date = process.env.DEMO ? new Date(1976, 7, 8) : new Date();
-					console.log(date);
+					let date = process.env.DEMO ? new Date(2021, 0, 4) : new Date();
 					let status = await create_main_log_object(item.root_folder, date);
 					if (!status || !status.length) return resolve();
 					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
