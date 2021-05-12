@@ -1,3 +1,6 @@
+require('dotenv').config({
+	path: __dirname + '/.env'
+});
 const express = require('express');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser')
@@ -11,6 +14,8 @@ const {
 const {
 	create_main_log_object
 } = require("./google.utils");
+
+const Sugar = require('sugar');
 
 const saltRounds = 10;
 const farmer = express.Router();
@@ -103,7 +108,7 @@ farmer.get("/check-off/:username/:file_id", isLoggedIn, async (req, res) => {
 
 farmer.post("/fill-out", isLoggedIn, async (req, res) => {
 	let return_value = await ignore_file(req.body.username, req.body.file_id);
-	if (return_value == true) {// direct to the google doc
+	if (return_value == true) { // direct to the google doc
 		return res.end("https://docs.google.com/" + req.body.type + "s/d/" + req.body.file_id + "/edit");
 	} else {
 		console.log(return_value);
@@ -129,15 +134,22 @@ farmer.get("/update", async (req, res) => {
 			return new Promise(async function(resolve, reject) {
 
 				try {
-					let status = await create_main_log_object(item.root_folder);
+					/* Good dates for showing:
+						new Date(2021, 4, 3)
+						new Date(2021, 0, 4)
+						new Date(1967, 7, 8)
+					*/
+					let date = process.env.DEMO ? new Date(1976, 7, 8) : new Date();
+					console.log(date);
+					let status = await create_main_log_object(item.root_folder, date);
 					if (!status || !status.length) return resolve();
-					let stat = status.map(function(folder) {
-						// when we run through here, this would be the best spot to send the email:
-						// have a link to their status page, a list of missing works
+					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
+						if (err) console.error(err);
+						let stat = status.map(function(folder) {
+							// when we run through here, this would be the best spot to send the email:
+							// have a link to their status page, a list of missing works
 
-						return new Promise(function(end, stop) {
-							connection.query("DELETE FROM status WHERE farmer_id=?", item.id, (err) => {
-								if (err) console.error(err);
+							return new Promise(function(end, stop) {
 								folder.file_type = !folder.file_type ? "unknown" : folder.file_type;
 								connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, file_type, frequency, ignore_notifier) VALUES (?, ?, ?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.file_type, folder.frequency_ofSubmission, folder.ignore_notifier], function(err) {
 									if (err) console.log(err);
@@ -145,9 +157,9 @@ farmer.get("/update", async (req, res) => {
 								});
 							});
 						});
+						await Promise.all(stat);
+						resolve();
 					});
-					await Promise.all(stat);
-					resolve();
 				} catch (error) {
 					console.error(error);
 					resolve();

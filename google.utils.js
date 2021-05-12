@@ -137,7 +137,7 @@ async function pull_main_logs(googleDriveInstance, main_folder_id) {
 		output: all_sheet_logs: the main log object of all the different forms they need filled out
 			with their names and times of fillling out (daily, weekly, on incident, etc.)
 */
-async function create_main_log_object(folder_id) {
+async function create_main_log_object(folder_id, drive_date) {
 	let creds_service_user, googleDriveInstance, gdrive, root_files;
 	try {
 		creds_service_user = require(PATH_TO_CREDENTIALS);
@@ -208,36 +208,35 @@ async function create_main_log_object(folder_id) {
 
 	let daily_value = full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1].toLowerCase().split(/[ :]+/);
 	daily_value[0] = daily_value[1] == "pm" ? parseInt(daily_value[0], 10) + 12 : parseInt(daily_value[0], 10) + 0;
-	all_dates.daily = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0]);
+	all_dates.daily = new Date(drive_date.getFullYear(), drive_date.getMonth(), drive_date.getDate(), daily_value[0]);
 
-	let weekly_value = new Date(moment().day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
-	weekly_value = new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
-	weekly_value = Sugar.Date.isFuture(weekly_value).raw ? new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate() - 7, daily_value[0]) : new Date(new Date(weekly_value).getFullYear(), new Date(weekly_value).getMonth(), new Date(weekly_value).getDate(), daily_value[0]);
-	all_dates.weekly = weekly_value;
+	let weekly_value = new Date(moment(drive_date).day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
+	weekly_value = new Date(weekly_value.getFullYear(), weekly_value.getMonth(), weekly_value.getDate(), daily_value[0]);
+	all_dates.weekly = Sugar.Date(drive_date).isAfter(weekly_value).raw ? new Date(weekly_value.getFullYear(), weekly_value.getMonth(), weekly_value.getDate() - 7, daily_value[0]) : weekly_value;
 
 	// get first week of this month
-	let monthly_value = new Date(moment().day(full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]));
+	let monthly_value = new Date(moment(drive_date).day(full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]));
 	monthly_value = new Date(monthly_value.getFullYear(), monthly_value.getMonth(), Math.round((monthly_value.getDate() + 1) % 7), daily_value[0]);
 
 	all_dates.monthly = monthly_value;
 
-	let season_date = new Date();
+	let season_date = drive_date;
 	all_dates.seasonal = season(season_date, seasons);
 	// // find what date season lines up
 	let temp_season = all_dates.seasonal;
 	while (all_dates.seasonal == temp_season) {
-		// create a new date moved back\
+		// create a new date moved back
 		season_date = new Date(season_date.getFullYear(), season_date.getMonth(), season_date.getDate() - 1);
 		all_dates.seasonal = season(season_date, seasons);
 	}
 	all_dates.seasonal = new Date(season_date.getFullYear(), season_date.getMonth(), season_date.getDate() + 1);
 
 	for (let days = 1; days < 8; days++) { // find first monday of year
-		all_dates.annual = new Date(new Date().getFullYear(), 0, days, daily_value[0]);
+		all_dates.annual = new Date(drive_date.getFullYear(), 0, days, daily_value[0]);
 		if (all_dates.annual.getDay() == 1)
 			break;
 	}
-	if (Sugar.Date.isFuture(all_dates.annual).raw) all_dates.annual = new Date(new Date(all_dates.annual).getFullYear() - 1, 0, new Date(all_dates.annual).getDay(), daily_value[0]);
+	if (Sugar.Date.isFuture(all_dates.annual).raw) all_dates.annual = new Date(all_dates.annual.getFullYear() - 1, 0, all_dates.annual.getDay(), daily_value[0]);
 
 	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
 	while (Sugar.Date.isFuture(preharvest_date).raw) {
@@ -248,7 +247,7 @@ async function create_main_log_object(folder_id) {
 
 	// find which delivery day is the most recent (past)
 	let recent = 0,
-		recent_date = new Date(),
+		recent_date = drive_date,
 		curr_date;
 	all_dates.deliverydays.forEach((day, index) => {
 		curr_date = Sugar.Date.create(day);
@@ -338,7 +337,7 @@ async function create_main_log_object(folder_id) {
 					connection.query("SELECT farmer_id, frequency FROM status WHERE file_id=? AND ignore_notifier=1", return_file[0], async (err, ignore_count) => {
 						if (err) console.error(err);
 
-						if (ignore_count.length && Sugar.Date(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
+						if (ignore_count.length && Sugar.Date(new Date(drive_date.getFullYear(), drive_date.getMonth(), drive_date.getDate(), daily_value[0], 0, 0)).is(all_dates[ignore_count[0].frequency]).raw)
 							status = true;
 
 						let ignore_notifier = ignore_count.length && !status ? 1 : 0;
@@ -346,13 +345,11 @@ async function create_main_log_object(folder_id) {
 						// find the correct index within the document - if we get to the end and still no position, it's a spreadsheet (same functional check, slightly different)
 						let spreadsheet_index_index = -1;
 						if (return_file[1] == "form")
-							for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++) {
-								main_logs
+							for (let run = 0; run < main_logs[use_spreadsheet].doc.sheetsByIndex.length; run++)
 								if (edit_dist(log_row._rawData[0].toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4), main_logs[use_spreadsheet].doc.sheetsByIndex[run]._rawProperties.title.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 4)) < 2) {
 									spreadsheet_index_index = run;
 									break;
-								}
-							};
+								};
 
 						// don't need to check if it's one of the following:
 						/*  onincident: 5,
@@ -365,7 +362,6 @@ async function create_main_log_object(folder_id) {
 						} else {
 							if (spreadsheet_index_index != -1) { // we can safely traverse the file and look for our date
 								status = await check_status(main_logs, all_dates, log_row._rawData[2], use_spreadsheet, spreadsheet_index_index, index);
-								if (log_row._rawData[2] == "daily") console.log("changing values", log_row._rawData[0], status, "\n");
 							} else {
 								status = true;
 							}
@@ -398,7 +394,6 @@ function check_status(google_sheet, all_dates, indicated_date, specific_spreadsh
 			try {
 				spreadsheet_rows = await google_sheet[specific_spreadsheet].doc.sheetsByIndex[specific_index].getRows();
 				// grab most recent value (specifically the timestamp) in the table
-				if (indicated_date == "daily") console.log(spreadsheet_rows);
 				if (!spreadsheet_rows[spreadsheet_rows.length - 1]) {
 					return resolve(true); // check to make sure there are values
 				}
