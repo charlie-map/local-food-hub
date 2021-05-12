@@ -1,21 +1,39 @@
 body {
   font-family: 'Trebuchet MS', sans-serif;
-  background-color: #CCFFCC;
+  background-image: url(https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/uploads/2018/08/IMG_9124-2000x700.jpg);
   background-repeat: no-repeat;
   background-size: cover;
+  background-attachment: fixed;
+  background-position: center top;
 }
 
-/*h2{
+/*h1{
   font-size: 50px;
   text-align: center;
-  color: #006400;
-  padding-top: 40px;
-}*/
-
-/*p{
-  text-align: center;
-  font-size: 20px;
+  color: white;
   }*/
+
+  .main-logo{
+    background-color: #E8E8E8;
+    opacity:0.9;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .full-logo{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+  }
+
+  .logo-icon{
+    width: 50px;
+    height:auto;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
 
 /*  .view-button {
     border-collapse:separate;
@@ -29,78 +47,88 @@ body {
     cursor: pointer;
     display: block;
     margin: 0 auto;
-  }*/
+    }*/
 
-  button:hover {
-    background-color: #7d0849;
-    color: white;
-  }
+    button:hover {
+      background-color: #7d0849;
+      color: white;
+    }
 
-  /* Button used to open the contact form - fixed at the bottom of the page */
-  .open-button {
-    border-collapse:separate;
-    border-radius:10px;
-    -moz-border-radius:6px;
-    border: 2px solid #7d0849;
-    background-color: white;
-    color: #7d0849;
-    padding: 30px 40px;
-    font-size: 25px;
-    cursor: pointer;
-    display: block;
-    margin: 0 auto;
-    display: block;
-  }
+    /* Button used to open the contact form - fixed at the bottom of the page */
+    .open-button {
+      border-collapse:separate;
+      border-radius:10px;
+      border: 2px solid #7d0849;
+      background-color: white;
+      color: #7d0849;
+      padding: 30px 50px;
+      font-size: 35px;
+      cursor: pointer;
+      display: block;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      z-index: -3;
+    }
 
-  /* The popup form - hidden by default */
-  .form-popup {
-    display: none;  
-    position: absolute;
-    bottom: 0;
-    margin: 0 auto;
-    z-index: 9;
-  }
+    /* The popup form - hidden by default */
+    .form-popup {
+      display: none;  
+      border: 3px solid #f1f1f1;
+      max-width: 300px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+    }
 
-  /* Add styles to the form container */
-  .form-container {
-    max-width: 300px;
-    padding: 10px;
-    background-color: white;
-  }
 
-  /* Full-width input fields */
-  .form-container input[type=text], .form-container input[type=password] {
-    width: 90%;
-    padding: 15px;
-    margin: 5px 0 10px 0;
-    border: none;
-    background: #f1f1f1;
-  }
+    /* Add styles to the form container */
+    .form-container {
+      max-width: 300px;
+      padding: 10px;
+      background-color: white;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      z-index: 0.9;
+    }
 
-  /* When the inputs get focus, do something */
-  .form-container input[type=text]:focus, .form-container input[type=password]:focus {
-    background-color: #ddd;
-    outline: none;
-  }
+    /* Full-width input fields */
+    .form-container input[type=text], .form-container input[type=password] {
+      width: 90%;
+      padding: 15px;
+      margin: 5px 0 10px 0;
+      border: none;
+      background: #f1f1f1;
+    }
 
-  /* Set a style for the submit/login button */
-  .form-container .btn {
-    background-color: #04AA6D;
-    color: white;
-    padding: 16px 20px;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom:10px;
-    opacity: 0.8;
-  }
+    /* When the inputs get focus, do something */
+    .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+      background-color: #ddd;
+      outline: none;
+    }
 
-  /* Add a red background color to the cancel button */
-  .form-container .cancel {
-    background-color: red;
-  }
+    /* Set a style for the submit/login button */
+    .form-container .btn {
+      background-color: #04AA6D;
+      color: white;
+      padding: 16px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom:10px;
+      opacity: 0.8;
+    }
 
-  /* Add some hover effects to buttons */
-  .form-container .btn:hover, .open-button:hover {
-    opacity: 1;
-  }
+    /* Add a red background color to the cancel button */
+    .form-container .cancel {
+      background-color: red;
+    }
+
+    /* Add some hover effects to buttons */
+    .form-container .btn:hover, .open-button:hover {
+      opacity: 1;
+    }
