@@ -1,0 +1,11 @@
+<pre><font face="arial">Hello {{FARM_NAME}},
+
+Today, {{CURR_DATE}}, you have {{FORM_BOOL}}
+
+{{ALL_FORMS}}
+You can view all of your forms on your account {{ACCOUNT_NAME}} at the Local Food Hub status page: {{STATUS_URL}}.
+
+Please contact us with questions,
+-- Local Food Hub
+Email: {{LFH_EMAIL}}
+Website: {{LFH_URL}}</font></pre>

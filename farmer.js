@@ -3,7 +3,9 @@ require('dotenv').config({
 });
 const express = require('express');
 const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 const {
 	connection,
@@ -26,6 +28,19 @@ farmer.use(bodyParser.urlencoded({
 let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On Incident", "As Needed",
 	"Corrective Action", "Risk Assessment", "Preharvest", "Delivery Days"
 ];
+
+function replace_string(text, replacement) {
+	// if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
+	//console.log("send mail", to, subject, text, replacement);
+	Object.keys(replacement).forEach((item, index) => {
+		let string = "{{" + item.toUpperCase() + "}}";
+		string = replacement[item] == "" ? " " + string : string;
+		let replacer = new RegExp(string, "g");
+		text = text.replace(replacer, replacement[item]);
+	});
+	console.log(text);
+	return text;
+}
 
 function find_type(frequencies, stat_value) {
 	let lowest = 1000,
@@ -139,8 +154,27 @@ farmer.get("/update", async (req, res) => {
 						new Date(2021, 0, 4)
 						new Date(1967, 7, 8)
 					*/
-					let date = process.env.DEMO ? new Date(2021, 0, 4) : new Date();
+					let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_status")).toString()
+					let date = process.env.DEMO ? new Date(2021, 6, 16) : new Date();
+					let build_status = {};
 					let status = await create_main_log_object(item.root_folder, date);
+					// let status = [{
+					// 	file_name: "test1",
+					// 	file_id: "4989",
+					// 	status: true,
+					// 	ignore_notifier: 0,
+					// 	file_type: "form",
+					// 	frequency_ofSubmission: "daily",
+					// 	turn_in_date: new Date(2021, 4, 12)
+					// }, {
+					// 	file_name: "test2",
+					// 	file_id: "8484",
+					// 	status: true,
+					// 	ignore_notifier: 0,
+					// 	file_type: "form",
+					// 	frequency_ofSubmission: "weekly",
+					// 	turn_in_date: new Date(2021, 4, 10)
+					// }];
 					if (!status || !status.length) return resolve();
 					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
 						if (err) console.error(err);
@@ -148,6 +182,16 @@ farmer.get("/update", async (req, res) => {
 							// when we run through here, this would be the best spot to send the email:
 							// have a link to their status page, a list of missing works
 
+							if (folder.status) {
+								let string_date = (new Date().getFullYear() != folder.turn_in_date.getFullYear() ||
+									new Date().getMonth() != folder.turn_in_date.getMonth() || new Date().getDate() != folder.turn_in_date.getDate()) ?
+								"was awhile ago" : "was due today";
+								build_status = { ...build_status,
+									...{
+										[folder.file_name]: " - " + string_date
+									}
+								};
+							}
 							return new Promise(function(end, stop) {
 								folder.file_type = !folder.file_type ? "unknown" : folder.file_type;
 								connection.query("INSERT INTO status (farmer_id, file_name, file_id, status, file_type, frequency, ignore_notifier) VALUES (?, ?, ?, ?, ?, ?, ?)", [item.id, folder.file_name, folder.file_id, folder.status.toString(), folder.file_type, folder.frequency_ofSubmission, folder.ignore_notifier], function(err) {
@@ -157,6 +201,23 @@ farmer.get("/update", async (req, res) => {
 							});
 						});
 						await Promise.all(stat);
+						let string_build = "";
+						Object.keys(build_status).forEach((build) => {
+							string_build += build + build_status[build] + "\n";
+						});
+
+						let build_object = {
+							farm_name: item.farm_name.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+							account_name: item.username,
+							curr_date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset()).toString(),
+							form_bool: Object.keys(build_status).length == 0 ? "no forms to fill out!" : Object.keys(build_status).length == 1 ?
+								"one form to fill out:" : Object.keys(build_status).length + " forms to fill out:",
+							status_url: process.env.FARM_URL,
+							lfh_email: process.env.LFH_EMAIL,
+							lfh_url: process.env.LFH_URL,
+							all_forms: string_build
+						}
+						text = replace_string(text, build_object);
 						resolve();
 					});
 				} catch (error) {

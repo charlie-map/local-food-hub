@@ -373,7 +373,8 @@ async function create_main_log_object(folder_id, drive_date) {
 							status: status,
 							ignore_notifier: ignore_notifier,
 							file_type: return_file[1],
-							frequency_ofSubmission: log_row._rawData[2]
+							frequency_ofSubmission: log_row._rawData[2],
+							turn_in_date: all_dates[log_row._rawData[2]]
 						};
 						return connection_promise();
 					});
