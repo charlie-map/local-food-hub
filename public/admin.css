@@ -28,8 +28,6 @@ h2{
   display: block;
   margin: 0 auto;
   display: block;
-  width: 300px;
-  margin-bottom: 20px;
 }
 
 .view_popup {
@@ -45,7 +43,6 @@ h2{
   display: block;
   margin: 0 auto;
   display: block;
-  width: 300px;
 }
 
 button:hover {
@@ -75,7 +72,7 @@ button:hover {
   display: none;  
   position: fixed;
   bottom: 0;
-  right: 15px;
+  right: 100px;
   border: 3px solid #f1f1f1;
   z-index: 9;
 }
@@ -84,6 +81,8 @@ button:hover {
 .form-container {
   max-width: 300px;
   padding: 10px;
+  position: absolute;
+    right: -11px;
   background-color: white;
 }
 
@@ -187,7 +186,6 @@ button:hover {
 }
 
 input:checked + .slider {
-  background-color: #7d0849;
 }
 
 input:focus + .slider {
@@ -225,7 +223,7 @@ input:checked + .slider:before {
 
 .help-tip{
     position: absolute;
-    top: 338px;
+    top: 243px;
     right: 18px;
     text-align: center;
     background-color: #BCDBEA;
