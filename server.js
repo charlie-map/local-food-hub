@@ -32,6 +32,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustacheExpress());
 app.use('/', router);
@@ -99,6 +100,6 @@ app.get("/logout", isLoggedIn, (req, res) => {
 //     res.end("hello" + " " + req.username);
 //     //res.redirect('/homebase');
 // });
-app.listen(6969, () => {
+app.listen(4989, () => {
     console.log("server go vroom");
 });
