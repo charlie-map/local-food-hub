@@ -180,24 +180,24 @@ farmer.get("/update", async (req, res) => {
 					let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_status")).toString()
 					let date = process.env.DEMO ? new Date(2021, 4, 17) : new Date();
 					let build_status = {};
-					let status = await create_main_log_object(item.root_folder, date);
-					// let status = [{
-					// 	file_name: "test1",
-					// 	file_id: "4989",
-					// 	status: true,
-					// 	ignore_notifier: 0,
-					// 	file_type: "form",
-					// 	frequency_ofSubmission: "daily",
-					// 	turn_in_date: new Date(2021, 4, 12)
-					// }, {
-					// 	file_name: "test2",
-					// 	file_id: "8484",
-					// 	status: true,
-					// 	ignore_notifier: 0,
-					// 	file_type: "form",
-					// 	frequency_ofSubmission: "weekly",
-					// 	turn_in_date: new Date(2021, 4, 10)
-					// }];
+					//let status = await create_main_log_object(item.root_folder, date);
+					 let status = [{
+					 	file_name: "test1",
+					 	file_id: "4989",
+					 	status: true,
+					 	ignore_notifier: 0,
+					 	file_type: "form",
+					 	frequency_ofSubmission: "daily",
+					 	turn_in_date: new Date(2021, 4, 12)
+					 }, {
+					 	file_name: "test2",
+					 	file_id: "8484",
+					 	status: true,
+					 	ignore_notifier: 0,
+					 	file_type: "form",
+					 	frequency_ofSubmission: "weekly",
+					 	turn_in_date: new Date(2021, 4, 10)
+					 }];
 					if (!status || !status.length) return resolve();
 					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
 						if (err) console.error(err);
