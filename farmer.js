@@ -7,20 +7,12 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 
-const nodemail = require("nodemailer");
-const sendmail = require("sendmail");
-
-let transporter = nodemail.createTransport({
-	sendmail: true,
-	newline: 'unix',
-	path: '/usr/sbin/sendmail'
-});
-
 const {
 	connection,
 	isLoggedIn,
 	frequency_ofSubmission,
-	edit_dist
+	edit_dist,
+	replace_string
 } = require("./utils");
 const {
 	create_main_log_object
@@ -37,33 +29,6 @@ farmer.use(bodyParser.urlencoded({
 let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On Incident", "As Needed",
 	"Corrective Action", "Risk Assessment", "Preharvest", "Delivery Days"
 ];
-
-function replace_string(to, text, replacement) {
-	if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
-	//console.log("send mail", to, subject, text, replacement);
-	Object.keys(replacement).forEach((item, index) => {
-		let string = "{{" + item.toUpperCase() + "}}";
-		string = replacement[item] == "" ? " " + string : string;
-		let replacer = new RegExp(string, "g");
-		text = text.replace(replacer, replacement[item]);
-	});
-	console.log(text);
-	return new Promise((transport_resolve, transport_reject) => {
-		transporter.sendMail({
-			from: '"Local Food Hub"<localfoodhub@cs.stab.org>',
-			replyTo: process.env.LFH_EMAIL,
-			to: to,
-			subject: "Your Status Update",
-			html: text
-		}, (err, info) => {
-			if (err) {
-				err.send_mail_info = info;
-				transport_reject(err);
-			}
-			transport_resolve(info);
-		});
-	});
-}
 
 function find_type(frequencies, stat_value) {
 	let lowest = 1000,
@@ -240,7 +205,7 @@ farmer.get("/update", async (req, res) => {
 							lfh_url: process.env.LFH_URL,
 							all_forms: string_build
 						}
-						text = replace_string(item.email, text, build_object);
+						await replace_string(item.email, text, build_object);
 						resolve();
 					});
 				} catch (error) {

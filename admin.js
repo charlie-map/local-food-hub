@@ -1,9 +1,15 @@
+require('dotenv').config({
+    path: __dirname + '/.env'
+});
 const express = require('express');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
 
 const {
     connection,
-    isLoggedIn
+    isLoggedIn,
+    replace_string
 } = require("./utils");
 const {
     v4: uuidv4
@@ -19,16 +25,16 @@ router.get("/admin", isLoggedIn, (req, res) => {
         num[0].num = num[0].num ? "checked" : "";
         connection.query("SELECT string FROM system_settings WHERE variable='service account'", (err, account) => {
             if (err) console.error(err);
-        res.render("admin", {
-            checked: num[0].num,
-            service_account: account[0].string,
-            password_change: req.query["pw-changed"] ? "Your password has been changed!" : ""
+            res.render("admin", {
+                checked: num[0].num,
+                service_account: account[0].string,
+                password_change: req.query["pw-changed"] ? "Your password has been changed!" : ""
+            });
         });
-    });
     });
 });
 
-router.post("/make-farm", isLoggedIn, (req, res) => {
+router.post("/make-farm", isLoggedIn, async (req, res) => {
     let test = {
         farm_name: req.body.farmname,
         username: req.body.username,
@@ -36,6 +42,15 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
         password: req.body.psw,
         root_folder: req.body.root_folder
     };
+    let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_invite"));
+    await replace_string(test.email, text, {
+        farm_name: test.farm_name,
+        farm_url: process.env.FARM_URL,
+        username: test.username,
+        password: test.password,
+        lfh_email: process.env.LFH_EMAIL,
+        lfh_url: process.env.LFH_URL
+    });
     bcrypt.hash(req.body.psw, saltRounds, function(err, hash) {
         test.password = hash;
         connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder) VALUES (?, ?, ?, ?, ?)", Object.values(test), function(err) {

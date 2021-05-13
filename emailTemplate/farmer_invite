@@ -1,0 +1,9 @@
+<pre><font face="arial">Hello {{FARM_NAME}},
+
+You have been invited to use the Local Food Hub Status page. Go to the <a href="{{STATUS_URL}}">Local Food Hub Status Page</a> and login with the info: username - {{USERNAME}}, and password - {{PASSWORD}}.
+
+Please contact us with questions,
+-- Local Food Hub
+
+Email: {{LFH_EMAIL}}
+Website: {{LFH_URL}}</font></pre>

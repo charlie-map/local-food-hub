@@ -1,6 +1,14 @@
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
+const nodemail = require("nodemailer");
+const sendmail = require("sendmail");
+
+let transporter = nodemail.createTransport({
+    sendmail: true,
+    newline: 'unix',
+    path: '/usr/sbin/sendmail'
+});
 
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
@@ -117,10 +125,38 @@ function edit_dist(w1, w2) {
     return array[array.length - 1][array[0].length - 1];
 }
 
+function replace_string(to, text, replacement) {
+    if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
+    //console.log("send mail", to, subject, text, replacement);
+    Object.keys(replacement).forEach((item, index) => {
+        let string = "{{" + item.toUpperCase() + "}}";
+        string = replacement[item] == "" ? " " + string : string;
+        let replacer = new RegExp(string, "g");
+        text = text.replace(replacer, replacement[item]);
+    });
+    console.log(text);
+    return new Promise((transport_resolve, transport_reject) => {
+        transporter.sendMail({
+            from: '"Local Food Hub"<localfoodhub@cs.stab.org>',
+            replyTo: process.env.LFH_EMAIL,
+            to: to,
+            subject: "Your Status Update",
+            html: text
+        }, (err, info) => {
+            if (err) {
+                err.send_mail_info = info;
+                transport_reject(err);
+            }
+            transport_resolve(info);
+        });
+    });
+}
+
 module.exports = {
     edit_dist,
     isLoggedIn,
     bcrypt,
     connection,
-    frequency_ofSubmission
+    frequency_ofSubmission,
+    replace_string
 };
