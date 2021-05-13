@@ -28,6 +28,8 @@ h2{
   display: block;
   margin: 0 auto;
   display: block;
+  width: 300px;
+  margin-bottom: 20px;
 }
 
 .view_popup {
@@ -43,6 +45,7 @@ h2{
   display: block;
   margin: 0 auto;
   display: block;
+  width: 300px;
 }
 
 button:hover {
