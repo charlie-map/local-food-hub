@@ -70,10 +70,34 @@
     background-color: #E8E8E8;
     border-radius: 7px;
   }
+
+  #list:nth-child(even) #statusoftype1 {
+    background-color: #E8E8E8;
+  }
+
+  #list:nth-child(odd) .panel > div:nth-child(odd) {
+    background-color: #E8E8E8;
+  }
   
+  #list:nth-child(odd) .panel > div:nth-child(even) {
+    background-color: #ddd;
+  }
+
   #list:nth-child(even) {
     background-color: #b1ba1e;
     border-radius: 7px;
+  }
+
+  #list:nth-child(even) #statusoftype1 {
+    background-color: #b1ba1e;
+  }
+
+  #list:nth-child(even) .panel > div:nth-child(odd) {
+    background-color: #eee;
+  }
+  
+  #list:nth-child(even) .panel > div:nth-child(even) {
+    background-color: #D0D923;
   }
 
   #title{
@@ -266,3 +290,43 @@ footer {
     top: 17%;
     right: 5%;
   }
+
+  /* Style the buttons that are used to open and close the accordion panel */
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  margin: 0 10px;
+  display: none;
+  overflow: hidden;
+}
+
+.panel > div {
+  min-height: 38px;
+  padding: 4px 10px;
+  margin-top: 5px;
+  line-height: 38px;
+  border-radius: 5px;
+}
+
+.panel > div > div {
+  float: right;
+  min-width: 100px;
+  text-align: right;
+  vertical-align: middle;
+}
