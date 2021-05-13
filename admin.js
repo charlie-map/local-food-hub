@@ -56,6 +56,7 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
                     status_url: process.env.FARM_URL,
                     username: test.username,
                     password: old_pass,
+                    drive_url: "https://drive.google.com/drive/u/1/folders/" + test.root_folder,
                     lfh_email: process.env.LFH_EMAIL,
                     lfh_url: process.env.LFH_URL
                 });

@@ -2,6 +2,8 @@
 
 You have been invited to use the Local Food Hub Status page. Go to the <a href="{{STATUS_URL}}">Local Food Hub Status Page</a> and login with the info: username - <b>{{USERNAME}}</b>, and password - <b>{{PASSWORD}}</b>.
 
+The current folder that is in used is <a href="{{DRIVE_URL}}">here</a>. If this seems wrong, please contact us at the email cited below.
+
 Please contact us with questions,
 -- Local Food Hub
 
