@@ -29,8 +29,8 @@ let frequencies_title = ["Daily", "Weekly", "Monthly", "Seasonal", "Annual", "On
 	"Corrective Action", "Risk Assessment", "Preharvest", "Delivery Days"
 ];
 
-function replace_string(text, replacement) {
-	// if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
+function replace_string(to, text, replacement) {
+	if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
 	//console.log("send mail", to, subject, text, replacement);
 	Object.keys(replacement).forEach((item, index) => {
 		let string = "{{" + item.toUpperCase() + "}}";
@@ -39,7 +39,21 @@ function replace_string(text, replacement) {
 		text = text.replace(replacer, replacement[item]);
 	});
 	console.log(text);
-	return text;
+	return new Promise((transport_resolve, transport_reject) => {
+		transporter.sendMail({
+			from: 'localfoodhub@cs.stab.org>',
+			replyTo: process.env.LFH_EMAIL,
+			to: to,
+			subject: "Your Status Update",
+			html: text
+		}, (err, info) => {
+			if (err) {
+				err.send_mail_info = info;
+				transport_reject(err);
+			}
+			transport_resolve(info);
+		});
+	});
 }
 
 function find_type(frequencies, stat_value) {
@@ -217,7 +231,7 @@ farmer.get("/update", async (req, res) => {
 							lfh_url: process.env.LFH_URL,
 							all_forms: string_build
 						}
-						text = replace_string(text, build_object);
+						text = replace_string(item.email, text, build_object);
 						resolve();
 					});
 				} catch (error) {
