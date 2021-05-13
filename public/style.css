@@ -9,25 +9,52 @@
     background-image: url("https://www.sciencemag.org/sites/default/files/styles/article_main_large/public/Agriculture_greenhousegases_1280x720.jpg?itok=cgd2bRxI");
     background-repeat: no-repeat;
     background-size: cover;
-    margin: 2em 1em;
+   /* margin: 2em 1em;
     line-height: 2.5em;
-    opacity: 0.9;
+    opacity: 0.9;*/
   }
 
-  h1 {
+/*  h1 {
     font-weight: bold;
     font-size: 50px;
     text-align: center;
     color: #006400;
     line-height: 1.1;
+  }*/
+
+  h2{
+    color: #b1ba1e;
+  }
+
+  .main-logo{
+    background-color: #E8E8E8;
+    opacity:0.9;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .full-logo{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+  }
+
+  .logo-icon{
+    width: 50px;
+    height:auto;
+    position: absolute;
+    top: 10px;
+    left: 10px;
   }
 
   #allStati {
     margin-top: none;
     position: static;
-    width: 85%;
+    max-width: 700px;
     margin-left: 5%;
     margin-right: 5%;
+    /*margin: auto;*/
     padding: 50px;
     border-radius: 18px;
     color: #001f3f;
@@ -35,13 +62,17 @@
     box-shadow: 6px 5px 24px #666666;
   }
 
+  #list{
+    padding-bottom: 5px;
+  }
+
   #list:nth-child(odd) {
-    background-color: #CCFFCC;
+    background-color: #E8E8E8;
     border-radius: 7px;
   }
   
   #list:nth-child(even) {
-    background-color: white;
+    background-color: #b1ba1e;
     border-radius: 7px;
   }
 
@@ -51,6 +82,41 @@
     font-size: 40px;
   }
 
+  #styling {
+    margin-top: none;
+    position: static;
+    max-width: 700px;
+    margin-left: 5%;
+    margin-right: 5%;
+    /*margin: auto;*/
+    background-color: rgb(255,255,255,0.8);
+    padding: 10px;
+    //border-radius: 18px;
+    color: #001f3f;
+    font-size: 20px
+    box-shadow: 6px 5px 24px #666666;
+  }
+
+/*  #styling{
+    padding-bottom: 5px;
+  }
+
+  #styling:nth-child(odd) {
+    background-color: #E8E8E8;
+    border-radius: 7px;
+  } 
+  
+  #styling:nth-child(even) {
+    background-color: #b1ba1e;
+    border-radius: 7px;
+  }*/
+
+/*  #title{
+    font-family: sans-serif;
+    font-style: bold;
+    font-size: 40px;
+  }
+*/
   .return-button{
     border-collapse:separate;
     border-radius:10px;
@@ -79,21 +145,21 @@
     margin: 0 auto;
   }
 
-button{
-  border-collapse:separate;
+  button{
+    border-collapse:separate;
     border-radius:10px;
     -moz-border-radius:6px;
-    border: 2px solid #006400;
+    border: 2px solid #7d0849;
     background-color: white;
-    color: #006400;
+    color: #7d0849;
     padding: 5px 10px;
     font-size: 15px;
     cursor: pointer;
     margin: 0 auto;
-}
+  }
 
   button:hover {
-    background-color: #006400;
+    background-color: #7d0849;
     color: white;
   }
 /*form {
@@ -105,7 +171,7 @@ button{
   max-width: 100ch;
   }*/
 
-  table, th, td {
+/*  table, th, td {
     padding: 10px;
     text-align: center;
     margin: auto; 
@@ -136,7 +202,7 @@ button{
   label {
     font-weight: bold;
   }
-
+*/
 /*input {
   border: 1px solid silver;
   display: block;
@@ -167,36 +233,36 @@ footer {
   border-top: 1px solid lightgrey;
   }*/
 
-#statusoftype {
-  display: inline;
-}
+  /*#statusoftype {
+    display: inline;
+  }*/
 
-#reset_password {
-  position: absolute;
-  top: 15%;
-  right: 5%;
-}
+  #reset_password {
+    position: absolute;
+    top: 10%;
+    left: 1%;
+  }
 
-#reset_password_form {
-  position: absolute;
-  width: calc(100vw - 60px);
-  top: calc(2vw - 180px);
-  right: calc(10vw - 400px);
-}
+  #reset_password_form {
+    position: absolute;
+    width: calc(100vw - 60px);
+    top: calc(2vw - 180px);
+    right: calc(10vw - 400px);
+  }
 
-#styling {
-  background: #F5F5F5;
-  padding: 8px;
-  border: 4px;
-  border-radius: 5px;
-}
+  /*#styling {
+    background: #F5F5F5;
+    padding: 8px;
+    border: 4px;
+    border-radius: 5px;
+  }*/
 
-#styling:nth-child(odd) {
-  background-color: #CCFFCC;
-}
+  /*#styling:nth-child(odd) {
+    background-color: #CCFFCC;
+  }*/
 
-#change_password {
-  position: absolute;
-  top: 17%;
-  right: 5%;
-}
+  #change_password {
+    position: absolute;
+    top: 17%;
+    right: 5%;
+  }

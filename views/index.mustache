@@ -7,21 +7,27 @@
 	<!-- import the webpage's stylesheet -->
 	<link rel="stylesheet" href="/style.css" />
 	<link rel="stylesheet" href="/login.css">
-  	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- import the webpage's client-side javascript file -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<title>Farm Status ⚪ {{farm_name}}</title>
 </head>
 <body>
-	<header>
-		<h1>Homepage for {{farm_name}}</h1>
-	</header>
+	<div class="main-logo">
+		<img class= "full-logo" src="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/full-logo.png">
+	</div>
+
+	<p>
+		<a href="https://www.localfoodhub.org/">
+			<img class= "logo-icon" src="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/footer-seal.png">
+		</a>
+	</p>
 	<main>
 
 		<h2>Required Forms</h2>
 		<h3 id="change_password">{{password_change}}</h3>
-		<div id = 'statusoftype'>{{#need_turnin}}
+		<div id = "statusoftype">{{#need_turnin}}
 			<div id="styling">
 				<span id="file_name"> {{FILE_NAME}}</span>
 				<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
@@ -36,12 +42,12 @@
 					<span id="file_name"> {{FILE_NAME}}</span>
 					<!-- <button class="deleteBoyAdmin" id="{{id}}" target="{{adminDecide}}"> Delete boy </button> -->
 					{{#STATUS}}
-						<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
-						<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}" title="Ignore this form"><i class="fas fa-times-circle"></i>
-						</button>
+					<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
+					<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}" title="Ignore this form"><i class="fas fa-times-circle"></i>
+					</button>
 					{{/STATUS}}
 					{{^STATUS}}
-						<a href="{{GOOGLE_URL}}"><button title="This item is completed, but you can still turn it in" id="complete"><i class="fas fa-check"></i></button></a>
+					<a href="{{GOOGLE_URL}}"><button title="This item is completed, but you can still turn it in" id="complete"><i class="fas fa-check"></i></button></a>
 					{{/STATUS}}
 					<br>
 				{{/row}}</div>
@@ -54,12 +60,12 @@
 
 		<div class="form-popup" id="reset_password_popup">
 			<form method="POST" id="reset_password_form" action="/farm/reset-password" class="form-container">
-        		<input type="text" placeholder="Enter username" name="username" required>
+				<input type="text" placeholder="Enter username" name="username" required>
 
-       			<input type="password" placeholder="Enter new password" name="password" required>
+				<input type="password" placeholder="Enter new password" name="password" required>
 
-       			<button type="submit" class="btn">Submit</button>
-        		<button type="button" id="close_popup" class="btn cancel">Close</button>
+				<button type="submit" class="btn">Submit</button>
+				<button type="button" id="close_popup" class="btn cancel">Close</button>
 			</form>
 		</div>
 	</main>
