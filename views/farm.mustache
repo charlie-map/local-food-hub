@@ -19,7 +19,7 @@
 
 	<div class="form-popup" id="build-edit-response">
       <form method="POST" action="/change-value" class="form-container">
-        <h1 id="title"></h1>
+        <h2 id="title"></h2>
 
         <input style="visibility: hidden; position: absolute; top: -10px" name="type" id="type-qualify">
         <input style="visibility: hidden; position: absolute; top: -10px" name="username" id="name-qualify">
@@ -32,11 +32,11 @@
 
     <script>
       function openForm() {
-        document.getElementById("build-edit-response").style.display = "block";
+        $("#build-edit-response").show();
       }
 
       function closeForm() {
-        document.getElementById("build-edit-response").style.display = "none";
+        $("#build-edit-response").hide();
       }
     </script>
 
@@ -46,7 +46,7 @@
 			<th>Email</th>
 			<th>Folder ID</th>
 		</tr>
-		<div id = 'allStati'>{{#type}}{{#.}}
+		<div id='allStati'>{{#type}}{{#.}}
 			<tr>
 				<td><span id=#farm-name>{{farm_name}}  <button title="Edit the farm's name" class="re-fill-farm-name" id="{{username}}"><i class="fas fa-edit"></i></button></span></td>
 				<td><span id=#email>{{email}}  <button title="Edit the farm's email" class="re-fill-email" id="{{username}}"><i class="fas fa-edit"></i></button></span></td>

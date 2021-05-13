@@ -155,7 +155,7 @@ farmer.get("/update", async (req, res) => {
 						new Date(1967, 7, 8)
 					*/
 					let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_status")).toString()
-					let date = process.env.DEMO ? new Date(2021, 6, 16) : new Date();
+					let date = process.env.DEMO ? new Date(2021, 4, 17) : new Date();
 					let build_status = {};
 					let status = await create_main_log_object(item.root_folder, date);
 					// let status = [{

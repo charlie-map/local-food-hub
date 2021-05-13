@@ -186,6 +186,7 @@ button:hover {
 }
 
 input:checked + .slider {
+  background-color: #7d0849;
 }
 
 input:focus + .slider {
@@ -208,17 +209,19 @@ input:checked + .slider:before {
 }
 
 #create_admin_checker {
-  position: absolute;
-  margin-top: 1%;
+  margin: auto;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 34px;
 }
 
-#label_create_admin {
+/*#label_create_admin {
   position: absolute;
   line-height: 1.1;
   top: -260%;
   width: 170%;
   color: #7d0849;
-}
+}*/
 
 
 .help-tip{
@@ -308,4 +311,9 @@ input:checked + .slider:before {
   position: absolute;
   top: 9%;
   right: 5%;
+}
+
+#admin_button_container button {
+  min-width: 300px;
+  margin-top: 20px;
 }

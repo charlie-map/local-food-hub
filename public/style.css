@@ -14,6 +14,10 @@
     opacity: 0.9;*/
   }
 
+  main {
+    margin: auto;
+  }
+
 /*  h1 {
     font-weight: bold;
     font-size: 50px;
@@ -22,8 +26,10 @@
     line-height: 1.1;
   }*/
 
-  h2{
-    color: #b1ba1e;
+  #statusoftype h2 {
+    color: #7d0849;
+    text-align: center;
+    padding: 20px 10px 0 10px;
   }
 
   .main-logo{
@@ -49,13 +55,10 @@
   }
 
   #allStati {
-    margin-top: none;
+    margin: auto;
+    margin-top: 69px;
     position: static;
-    max-width: 700px;
-    margin-left: 5%;
-    margin-right: 5%;
-    /*margin: auto;*/
-    padding: 50px;
+    max-width: 800px;
     border-radius: 18px;
     color: #001f3f;
     font-size: 20px
@@ -100,32 +103,44 @@
     background-color: #D0D923;
   }
 
-  #title{
+  #button_title{
     font-family: sans-serif;
     font-style: bold;
     font-size: 40px;
   }
 
-  #styling {
-    margin-top: none;
-    position: static;
-    max-width: 700px;
-    margin-left: 5%;
-    margin-right: 5%;
-    /*margin: auto;*/
+  #statusoftype {
+    border-radius: 7px;
+    margin: auto;
+    max-width: 600px;
     background-color: rgb(255,255,255,0.8);
-    padding: 10px;
-    //border-radius: 18px;
-    color: #001f3f;
-    font-size: 20px
-    box-shadow: 6px 5px 24px #666666;
   }
 
-/*  #styling{
-    padding-bottom: 5px;
+  #styling {
+    margin-top: 5px;
+    min-height: 38px;
+    padding: 4px 10px;
+    line-height: 38px;
+    text-indent: -20px;
+    padding-left: 30px;
   }
 
-  #styling:nth-child(odd) {
+  #styling > div {
+    float: right;
+    min-width: 100px;
+    text-align: right;
+    vertical-align: middle;
+  }
+
+  #styling:nth-child(even) {
+    background-color: rgb(255, 255, 255, 0.9);
+  }
+
+  #styling:last-child {
+    border-radius: 0 0 7px 7px;
+  }
+
+/*  #styling:nth-child(odd) {
     background-color: #E8E8E8;
     border-radius: 7px;
   } 
@@ -195,10 +210,10 @@
   max-width: 100ch;
   }*/
 
-/*  table, th, td {
+  table, th, td {
     padding: 10px;
     text-align: center;
-    margin: auto; 
+    margin: auto;
   }
 
   table {
@@ -226,7 +241,12 @@
   label {
     font-weight: bold;
   }
-*/
+
+  #build-edit-response {
+    position: absolute;
+    top: 110px;
+  }
+
 /*input {
   border: 1px solid silver;
   display: block;
@@ -263,15 +283,14 @@ footer {
 
   #reset_password {
     position: absolute;
-    top: 10%;
-    left: 1%;
+    bottom: 10px;
+    left: 10px;
   }
 
-  #reset_password_form {
+  #reset_password_popup {
     position: absolute;
-    width: calc(100vw - 60px);
-    top: calc(2vw - 180px);
-    right: calc(10vw - 400px);
+    top: 110%;
+    left: 0;
   }
 
   /*#styling {
@@ -286,9 +305,8 @@ footer {
   }*/
 
   #change_password {
-    position: absolute;
-    top: 17%;
-    right: 5%;
+    text-align: center;
+    color: white;
   }
 
   /* Style the buttons that are used to open and close the accordion panel */

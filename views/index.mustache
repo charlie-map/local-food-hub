@@ -5,7 +5,7 @@
 <link rel="shortcut icon" type="image/png" href="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/footer-seal.png">
 <head>
 	<!-- import the webpage's stylesheet -->
-	<link rel="stylesheet" href="/style.css" />
+	<link rel="stylesheet" href="/style.css"/>
 	<link rel="stylesheet" href="/login.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -16,28 +16,47 @@
 <body>
 	<div class="main-logo">
 		<img class= "full-logo" src="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/full-logo.png">
+		<div>
+			<button id="reset_password">
+				Reset password
+			</button>
+
+			<div id="reset_password_popup">
+				<form method="POST" action="/farm/reset-password" class="form-container">
+					<input type="text" placeholder="Enter username" name="username" required>
+
+					<input type="password" placeholder="Enter new password" name="password" required>
+
+					<button type="submit" class="btn">Submit</button>
+					<button type="button" id="close_popup" class="btn cancel">Close</button>
+				</form>
+			</div>
+		</div>
 	</div>
 
 	<p>
 		<a href="https://www.localfoodhub.org/">
-			<img class= "logo-icon" src="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/footer-seal.png">
+			<img class="logo-icon" src="https://3rqwhc1s0oq36ghi9103i28l-wpengine.netdna-ssl.com/wp-content/themes/local-food-hub-theme/images/footer-seal.png">
 		</a>
 	</p>
 	<main>
 
-		<h2>Required Forms</h2>
 		<h3 id="change_password">{{password_change}}</h3>
-		<div id = "statusoftype">{{#need_turnin}}
+		<div id = "statusoftype">
+			<h2>Required Forms</h2>
+			{{#need_turnin}}
 			<div id="styling">
+				<div>
+					<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
+					<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
+				</div>
 				<span id="file_name"> {{FILE_NAME}}</span>
-				<button title="Click here to fill out form" class="fill_out" id="{{USERNAME}}/{{FILE_URL}}"><i class="fas fa-edit"></i></button>
-				<button class="ignore_file" title="Ignore file - Don't get notifications about this form." id="{{USERNAME}}/{{FILE_ID}}"><i class="fas fa-times-circle"></i></button>
 			</div>
 		{{/need_turnin}}</div>
 
 		<div id='allStati'>{{#type}}{{#.}}
 			<ul id="list">
-				<button class="accordion" id = "title">{{titleoftype}}</button>
+				<button class="accordion" id = "button_title">{{titleoftype}}</button>
 				<div class="panel" id='statusoftype1'>{{#row}}
 					<div>
 						<div>
@@ -56,21 +75,6 @@
 				{{/row}}</div>
 			</ul>
 		{{/.}}{{/type}}</div>
-
-		<button id="reset_password">
-			Reset password
-		</button>
-
-		<div class="form-popup" id="reset_password_popup">
-			<form method="POST" id="reset_password_form" action="/farm/reset-password" class="form-container">
-				<input type="text" placeholder="Enter username" name="username" required>
-
-				<input type="password" placeholder="Enter new password" name="password" required>
-
-				<button type="submit" class="btn">Submit</button>
-				<button type="button" id="close_popup" class="btn cancel">Close</button>
-			</form>
-		</div>
 	</main>
 	<script src="/script.js"></script>
 	<script src="https://kit.fontawesome.com/3787aa0e64.js" crossorigin="anonymous"></script>

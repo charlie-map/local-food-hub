@@ -14,20 +14,25 @@
 
   <h2>Admin Page</h2>
   <h3 id="change_password">{{password_change}}</h3>
-  <!-- <p>Ayo we got some stuff goin on</p> -->
-  <!-- <p>Note that the button and the form is fixed - they will always be positioned to the bottom of the browser window.</p> -->
-  <label class="switch" id="create_admin_checker">
-    <label id="label_create_admin">Turn off creating admin accounts?</label>
-    <input type="checkbox" id="check_value" {{checked}}>
-    <span class="slider round" id="slider"></span>
-  </label>
+  <div id="create_admin_checker">
+    <span id="label_create_admin">Turn off creating admin accounts?</span>
+    <label class="switch">
+      <input type="checkbox" id="check_value" {{checked}}>
+      <span class="slider round" id="slider"></span>
+    </label>
+  </div>
   
+  <div id="admin_button_container">
+
   <form method="get" action="/view-farms">
     <button class="view-button">View Farms</button>
   </form>
-
   <!-- <a href="/view-farms" class="view-button">View Farms</a> -->
   <button class="view-button" onclick="openForm()">Add Farm</button>
+    <button class="view_popup">
+      Reset password
+    </button>
+  </div>
 
   <div class="form-popup" id="myForm">
     <form action="/make-farm" method="POST" class="form-container">
@@ -65,9 +70,6 @@
       document.getElementById("myForm").style.display = "none";
     }
   </script>
-    <button class="view_popup">
-      Reset password
-    </button>
 
     <div class="form-popup" id="reset_password_popup">
       <form method="POST" action="/change-password" class="form-container">
