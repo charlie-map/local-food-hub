@@ -7,6 +7,15 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 
+const nodemail = require("nodemailer");
+const sendmail = require("sendmail");
+
+let transporter = nodemail.createTransport({
+	sendmail: true,
+	newline: 'unix',
+	path: '/usr/sbin/sendmail'
+});
+
 const {
 	connection,
 	isLoggedIn,
