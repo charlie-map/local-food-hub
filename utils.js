@@ -135,7 +135,6 @@ function replace_string(to, subject, text, replacement) {
         text = text.replace(replacer, replacement[item]);
     });
     console.log(text);
-    return;
     return new Promise((transport_resolve, transport_reject) => {
         transporter.sendMail({
             from: '"Local Food Hub"<localfoodhub@cs.stab.org>',
