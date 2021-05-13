@@ -50,7 +50,7 @@ function replace_string(to, text, replacement) {
 	console.log(text);
 	return new Promise((transport_resolve, transport_reject) => {
 		transporter.sendMail({
-			from: 'localfoodhub@cs.stab.org>',
+			from: '"Local Food Hub"<localfoodhub@cs.stab.org>',
 			replyTo: process.env.LFH_EMAIL,
 			to: to,
 			subject: "Your Status Update",
