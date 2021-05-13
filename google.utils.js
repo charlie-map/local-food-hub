@@ -17,7 +17,7 @@ const {
 const drive = google.drive('v2');
 // create a drive access
 const auth = new google.auth.GoogleAuth({
-	keyFilename: 'key.json',
+	keyFilename: PATH_TO_CREDENTIALS,
 	scopes: _SCOPES[1]
 });
 let authClient;
