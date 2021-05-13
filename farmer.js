@@ -205,7 +205,7 @@ farmer.get("/update", async (req, res) => {
 							lfh_url: process.env.LFH_URL,
 							all_forms: string_build
 						}
-						await replace_string(item.email, text, build_object);
+						await replace_string(item.email, "Your Status Update", text, build_object);
 						resolve();
 					});
 				} catch (error) {

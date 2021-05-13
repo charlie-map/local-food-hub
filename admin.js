@@ -51,7 +51,7 @@ router.post("/make-farm", isLoggedIn, (req, res) => {
                 if (err.errno == 1062) return res.end("1062");
             } else {
                 let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_invite")).toString();
-                await replace_string(test.email, text, {
+                await replace_string(test.email, "Your Account Has Been Made", text, {
                     farm_name: test.farm_name,
                     status_url: process.env.FARM_URL,
                     username: test.username,

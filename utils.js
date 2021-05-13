@@ -125,7 +125,7 @@ function edit_dist(w1, w2) {
     return array[array.length - 1][array[0].length - 1];
 }
 
-function replace_string(to, text, replacement) {
+function replace_string(to, subject, text, replacement) {
     if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
     console.log("send mail", to, text, replacement);
     Object.keys(replacement).forEach((item, index) => {
@@ -140,7 +140,7 @@ function replace_string(to, text, replacement) {
             from: '"Local Food Hub"<localfoodhub@cs.stab.org>',
             replyTo: process.env.LFH_EMAIL,
             to: to,
-            subject: "Your Status Update",
+            subject: subject,
             html: text
         }, (err, info) => {
             if (err) {
