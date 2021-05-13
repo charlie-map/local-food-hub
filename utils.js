@@ -127,7 +127,7 @@ function edit_dist(w1, w2) {
 
 function replace_string(to, text, replacement) {
     if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
-    //console.log("send mail", to, subject, text, replacement);
+    console.log("send mail", to, text, replacement);
     Object.keys(replacement).forEach((item, index) => {
         let string = "{{" + item.toUpperCase() + "}}";
         string = replacement[item] == "" ? " " + string : string;

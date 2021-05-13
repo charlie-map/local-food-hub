@@ -34,7 +34,7 @@ router.get("/admin", isLoggedIn, (req, res) => {
     });
 });
 
-router.post("/make-farm", isLoggedIn, async (req, res) => {
+router.post("/make-farm", isLoggedIn, (req, res) => {
     let test = {
         farm_name: req.body.farmname,
         username: req.body.username,
@@ -42,22 +42,23 @@ router.post("/make-farm", isLoggedIn, async (req, res) => {
         password: req.body.psw,
         root_folder: req.body.root_folder
     };
-    let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_invite"));
-    await replace_string(test.email, text, {
-        farm_name: test.farm_name,
-        farm_url: process.env.FARM_URL,
-        username: test.username,
-        password: test.password,
-        lfh_email: process.env.LFH_EMAIL,
-        lfh_url: process.env.LFH_URL
-    });
     bcrypt.hash(req.body.psw, saltRounds, function(err, hash) {
+        let old_pass = test.password;
         test.password = hash;
-        connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder) VALUES (?, ?, ?, ?, ?)", Object.values(test), function(err) {
+        connection.query("INSERT INTO farmers (farm_name, username, email, password, root_folder) VALUES (?, ?, ?, ?, ?)", Object.values(test), async function(err) {
             if (err) {
                 console.log("err?", err.errno, err);
                 if (err.errno == 1062) return res.end("1062");
             } else {
+                let text = fs.readFileSync(path.join(__dirname, "emailTemplate", "farmer_invite")).toString();
+                await replace_string(test.email, text, {
+                    farm_name: test.farm_name,
+                    status_url: process.env.FARM_URL,
+                    username: test.username,
+                    password: old_pass,
+                    lfh_email: process.env.LFH_EMAIL,
+                    lfh_url: process.env.LFH_URL
+                });
                 res.redirect("/admin");
             }
         });
