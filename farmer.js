@@ -170,7 +170,7 @@ farmer.get("/update", async (req, res) => {
 							// when we run through here, this would be the best spot to send the email:
 							// have a link to their status page, a list of missing works
 
-							if (folder.status) {
+							if (folder.status && folder.ignore_notifier == 0) {
 								let string_date = (new Date().getFullYear() != folder.turn_in_date.getFullYear() ||
 									new Date().getMonth() != folder.turn_in_date.getMonth() || new Date().getDate() != folder.turn_in_date.getDate()) ?
 								"awhile ago" : "due today";
