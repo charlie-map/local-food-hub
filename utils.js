@@ -145,7 +145,7 @@ function replace_string(to, subject, text, replacement) {
         }, (err, info) => {
             if (err) {
                 err.send_mail_info = info;
-                transport_reject(err);
+                transport_resolve(err);
             }
             transport_resolve(info);
         });

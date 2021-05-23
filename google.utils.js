@@ -172,14 +172,17 @@ async function create_main_log_object(folder_id, drive_date) {
 					private_key: process.env.PRIVATE_KEY
 				})
 				await pull_log_doc.loadInfo();
+
 				main_logs[index] = {
 					name: log.name,
 					parent_id: log.parents[log.parents.length - 1],
 					doc: pull_log_doc
 				}
+
 				resolve();
 			} catch (error) {
-				reject(error);
+				console.log(error);
+				resolve();
 			}
 		});
 	});
@@ -210,9 +213,11 @@ async function create_main_log_object(folder_id, drive_date) {
 	daily_value[0] = daily_value[1] == "pm" ? parseInt(daily_value[0], 10) + 12 : parseInt(daily_value[0], 10) + 0;
 	all_dates.daily = new Date(drive_date.getFullYear(), drive_date.getMonth(), drive_date.getDate(), daily_value[0]);
 
-	let weekly_value = new Date(moment(drive_date).day(full_row_data[frequency_position + 2]._rawData[full_row_data[frequency_position + 2]._rawData.length - 1]));
-	weekly_value = new Date(weekly_value.getFullYear(), weekly_value.getMonth(), weekly_value.getDate(), daily_value[0]);
-	all_dates.weekly = Sugar.Date(drive_date).isAfter(weekly_value).raw ? new Date(weekly_value.getFullYear(), weekly_value.getMonth(), weekly_value.getDate() - 7, daily_value[0]) : weekly_value;
+	weekly_value = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), daily_value[0]);
+	while (weekly_value.getDay() != 1) {
+		weekly_value = new Date(weekly_value.getFullYear(), weekly_value.getMonth(), weekly_value.getDate() - 1, daily_value[0]);
+	}
+	all_dates.weekly = weekly_value;
 
 	// get first week of this month
 	let monthly_value = new Date(moment(drive_date).day(full_row_data[frequency_position + 3]._rawData[full_row_data[frequency_position + 3]._rawData.length - 1]));
@@ -239,6 +244,7 @@ async function create_main_log_object(folder_id, drive_date) {
 	if (Sugar.Date.isFuture(all_dates.annual).raw) all_dates.annual = new Date(all_dates.annual.getFullYear() - 1, 0, all_dates.annual.getDay(), daily_value[0]);
 
 	let preharvest_date = Sugar.Date.create(full_row_data[frequency_position + 6]._rawData[full_row_data[frequency_position + 6]._rawData.length - 1]);
+	preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	while (Sugar.Date.isFuture(preharvest_date).raw) {
 		preharvest_date = new Date(preharvest_date.getFullYear() - 1, preharvest_date.getMonth(), preharvest_date.getDate(), daily_value[0]);
 	}
@@ -251,7 +257,7 @@ async function create_main_log_object(folder_id, drive_date) {
 		curr_date;
 	all_dates.deliverydays.forEach((day, index) => {
 		curr_date = Sugar.Date.create(day);
-		curr_date = Sugar.Date(curr_date).isFuture().raw ? new Date(curr_date.getFullYear(), curr_date.getMonth(), curr_date.getDate() - 7) : curr_date;
+		curr_date = Sugar.Date(curr_date).isFuture().raw ? new Date(curr_date.getFullYear(), curr_date.getMonth(), curr_date.getDate() - 7, daily_value[0]) : curr_date;
 		if (Sugar.Date(recent_date).isAfter(curr_date).raw && (Sugar.Date(curr_date).isAfter(all_dates.deliverydays[recent]).raw || index == 0)) {
 			recent = index;
 			recent_date = curr_date;
@@ -398,6 +404,7 @@ function check_status(google_sheet, all_dates, indicated_date, specific_spreadsh
 				if (!spreadsheet_rows[spreadsheet_rows.length - 1]) {
 					return resolve(true); // check to make sure there are values
 				}
+
 				let timestamp = spreadsheet_rows[spreadsheet_rows.length - 1] && spreadsheet_rows[spreadsheet_rows.length - 1]._rawData ? new Date(spreadsheet_rows[spreadsheet_rows.length - 1]._rawData[0]) : undefined;
 				timestamp = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes() - new Date().getTimezoneOffset());
 				if (all_dates[indicated_date] && timestamp && Sugar.Date(all_dates[indicated_date]).isAfter(timestamp).raw) {
