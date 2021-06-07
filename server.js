@@ -100,6 +100,6 @@ app.get("/logout", isLoggedIn, (req, res) => {
 //     res.end("hello" + " " + req.username);
 //     //res.redirect('/homebase');
 // });
-app.listen(4989, () => {
+app.listen(process.env.PORT, () => {
     console.log("server go vroom");
 });
