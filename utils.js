@@ -1,5 +1,9 @@
+require('dotenv').config({
+	path: __dirname + "/.env"
+});
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
+const express = require('express');
 
 const nodemail = require("nodemailer");
 const sendmail = require("sendmail");
@@ -33,7 +37,9 @@ const frequency_ofSubmission = {
 // GRANT ALL PRIVILEGES ON foodhub.* TO 'foodhubuser'@'localhost';
 // FLUSH PRIVILEGES;
 
-const connection = mysql.createConnection({
+console.log(process.env.FOOD_USER);
+
+let connection = mysql.createConnection({
     host: process.env.HOST,
     database: process.env.DATABASE,
     user: process.env.FOOD_USER,
