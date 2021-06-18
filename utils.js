@@ -152,11 +152,41 @@ function replace_string(to, subject, text, replacement) {
     });
 }
 
+const utilities = express.Router();
+
+utilities.post("/test-connection", (req, res, next) => {
+    if (req.body.code == process.env.DATABASE_CHECK_CODE) {
+        console.log(new Date(), "System received database check");
+        connection.query("SELECT value_str FROM system_settings", function(err, value) {
+                if (!err) {
+                    res.end("No error :)");
+                }
+            if (err) {
+                connection = mysql.createConnection({
+                        host: process.env.HOST,
+                        database: process.env.DATABASE,
+                        password: process.env.PASSWORD,
+                        user: process.env.DB_USER,
+                        insecureAuth: true
+                });
+                connection.connect((err) => {
+                        if (err) throw err;
+                    console.log("No restart error");
+                    res.end("Mysql rebooted ;)");
+                });
+            }
+        });
+    } else {
+        res.end("Incorrect code");
+    }
+});
+
 module.exports = {
     edit_dist,
     isLoggedIn,
     bcrypt,
     connection,
     frequency_ofSubmission,
-    replace_string
+    replace_string,
+    utilities
 };

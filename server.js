@@ -10,7 +10,8 @@ const {
     edit_dist,
     isLoggedIn,
     bcrypt,
-    connection
+    connection,
+    utilities
 } = require('./utils.js');
 const {
     create_main_log_object
@@ -36,6 +37,7 @@ app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustacheExpress());
 app.use('/', router);
+app.use('/', utilities);
 
 // https://expressjs.com/en/starter/basic-routing.html
 app.get("/", (request, response) => {
