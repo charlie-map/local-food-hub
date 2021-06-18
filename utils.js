@@ -1,5 +1,5 @@
 require('dotenv').config({
-	path: __dirname + "/.env"
+    path: __dirname + "/.env"
 });
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
@@ -17,19 +17,19 @@ let transporter = nodemail.createTransport({
 // INTERNAL REPRASENTATION OF DAILY = 0, WEEKLY = 1, MONTHLY = 2, SEASONAL = 3, ANNUAL = 4, ONINCIDENT = 5, 
 // ASNEEDED = 6, CORRECTIVEACTION = 7, RISKASSESMENT = 8, PREHARVEST = 9, DELIVERYDAYS = 10
 const frequency_ofSubmission = {
-	daily: 0, // a must submit
-	daily_type: "Daily",
-	weekly: 1, // must submit
-	daily_type: "Weekly",
-	monthly: 2, // must submit
-	seasonal: 3, // must submit
-	annual: 4, // must submit
-	onincident: 5,
-	asneeded: 6,
-	correctiveaction: 7,
-	riskassesment: 8,
-	preharvest: 9, // must submit
-	deliverydays: 10 // must submit
+    daily: 0, // a must submit
+    daily_type: "Daily",
+    weekly: 1, // must submit
+    daily_type: "Weekly",
+    monthly: 2, // must submit
+    seasonal: 3, // must submit
+    annual: 4, // must submit
+    onincident: 5,
+    asneeded: 6,
+    correctiveaction: 7,
+    riskassesment: 8,
+    preharvest: 9, // must submit
+    deliverydays: 10 // must submit
 }
 
 // To create user on table (after making database):
@@ -132,7 +132,7 @@ function edit_dist(w1, w2) {
 }
 
 function replace_string(to, subject, text, replacement) {
-    if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false; 
+    if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(to)) return false;
     console.log("send mail", to, text, replacement);
     Object.keys(replacement).forEach((item, index) => {
         let string = "{{" + item.toUpperCase() + "}}";
@@ -163,20 +163,20 @@ const utilities = express.Router();
 utilities.post("/test-connection", (req, res, next) => {
     if (req.body.code == process.env.DATABASE_CHECK_CODE) {
         console.log(new Date(), "System received database check");
-        connection.query("SELECT value_str FROM system_settings", function(err, value) {
-                if (!err) {
-                    res.end("No error :)");
-                }
+        connection.query("SELECT variable FROM system_settings", function(err, value) {
+            if (!err) {
+                res.end("No error :)");
+            }
             if (err) {
                 connection = mysql.createConnection({
-                        host: process.env.HOST,
-                        database: process.env.DATABASE,
-                        password: process.env.PASSWORD,
-                        user: process.env.DB_USER,
-                        insecureAuth: true
+                    host: process.env.HOST,
+                    database: process.env.DATABASE,
+                    password: process.env.PASSWORD,
+                    user: process.env.FOOD_USER,
+                    insecureAuth: true
                 });
                 connection.connect((err) => {
-                        if (err) throw err;
+                    if (err) throw err;
                     console.log("No restart error");
                     res.end("Mysql rebooted ;)");
                 });
