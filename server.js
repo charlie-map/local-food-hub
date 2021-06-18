@@ -50,7 +50,9 @@ app.post("/login", function(req, res) {
             res.sendFile(__dirname + '/views/login.html');
             return;
         }
+	console.log(row);
         bcrypt.compare(req.body.psw, row[0].password, function(err, result) {
+		console.log("COMPARING", result);
             if (result) {
                 let now = new Date();
                 now.setSeconds(now.getSeconds() + 3600);
@@ -61,6 +63,7 @@ app.post("/login", function(req, res) {
                     connection.query('INSERT INTO uuid(token, farmer_id, expiry) values(?,?,?)', [token, row[0].id, now], (err) => {
                         if (err) console.log(err);
                         res.cookie("token", token);
+			console.log("made token");
                         if (row[0].account_type == 0) {
                             res.redirect('/farm/view-status?username=' + req.body.username);
                         } else {

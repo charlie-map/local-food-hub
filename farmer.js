@@ -130,7 +130,8 @@ farmer.post("/reset-password", isLoggedIn, (req, res) => {
 	});
 });
 
-farmer.get("/update", async (req, res) => {
+farmer.get("/update/:uuid", async (req, res) => {
+	if (req.params.uuid != process.env.UPDATE_UUID) return res.redirect("/");
 	connection.query("SELECT * FROM farmers WHERE account_type=0", async function(err, farmer) {
 		if (err) console.log(err);
 		let await_farmers = farmer.map(function(item, index) {
@@ -146,7 +147,6 @@ farmer.get("/update", async (req, res) => {
 					let date = process.env.DEMO ? new Date(2021, 4, 17) : new Date();
 					let build_status = {};
 					let status = await create_main_log_object(item.root_folder, date);
-					
 					if (!status || !status.length) return resolve();
 					connection.query("DELETE FROM status WHERE farmer_id=?", item.id, async (err) => {
 						if (err) console.error(err);
